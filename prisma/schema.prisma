@@ -75,3 +75,14 @@ model Verification {
 
   @@map("verification")
 }
+
+
+model Event{
+  id          String   @id @map("_id") @default(cuid())
+  slug        String  @unique
+  title       String
+  description String
+  image       String
+  createdAt   DateTime
+  @@map("event")
+}

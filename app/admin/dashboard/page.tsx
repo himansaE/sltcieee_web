@@ -4,7 +4,7 @@ import { Role } from "@prisma/client";
 const AdminDashBoard = () => {
   return (
     <div>
-      <h1>Admin Dashboard</h1>
+      <h1 className="py-5">Admin Dashboard</h1>
     </div>
   );
 };
