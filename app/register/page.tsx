@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { useFormik } from "formik";
 import { authClient } from "@/lib/auth/client";
 import { useState } from "react";
+import { OnlyDevRender } from "@/components/onlyDev";
 
-export default function RegisterAdmin() {
+function RegisterAdmin() {
   const [error, setError] = useState<string | null>(null);
 
   const params = new URLSearchParams(window.location.search);
@@ -156,3 +157,5 @@ export default function RegisterAdmin() {
     </div>
   );
 }
+
+export default OnlyDevRender(RegisterAdmin);
