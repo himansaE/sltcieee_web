@@ -21,6 +21,13 @@ import {
 import { PlusCircle, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { useFormik } from "formik";
+import { useState } from "react";
+import { TextInput } from "@/components/widgets/textInput";
+import { eventValidationSchema } from "@/lib/validation/event";
+import { cn } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
+import { uploadFile } from "@/lib/api/uploadFile";
+import Spinner from "@/components/ui/spinner";
 
 export default function AddNewEvent() {
   const formik = useFormik({
@@ -31,18 +38,35 @@ export default function AddNewEvent() {
       organizationUnit: "",
       description: "",
     },
-    onSubmit: (values) => {
-      console.log(values);
+    validationSchema: eventValidationSchema,
+    onSubmit: async (values) => {
+      if (!values.logo) {
+        formik.setFieldError("logo", "Event logo is required");
+        return;
+      }
+      uploadFileMutation({
+        buffer: values.logo,
+        key: (values.logo as File)?.name ?? "",
+      });
     },
   });
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-
     if (file) {
-      formik.setFieldValue("logo", URL.createObjectURL(file));
+      if (logoUrl) URL.revokeObjectURL(logoUrl);
+      setLogoUrl(URL.createObjectURL(file));
+      formik.setFieldValue("logo", file);
     }
   };
+
+  const { mutate: uploadFileMutation, isPending: isUploading } = useMutation({
+    mutationFn: uploadFile,
+    onSuccess: () => {
+      alert("Event added successfully");
+    },
+  });
 
   return (
     <Dialog>
@@ -64,14 +88,18 @@ export default function AddNewEvent() {
             <div className="flex items-center justify-center">
               <Label
                 htmlFor="logo"
-                className="cursor-pointer flex items-center justify-center w-24 h-24 rounded-full bg-gray-100 border-2 border-gray-300 border-dashed hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                className={cn(
+                  "cursor-pointer flex items-center justify-center w-24 h-24 rounded-full bg-gray-100 border-2 border-gray-300 border-dashed hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary",
+                  formik.errors.logo && "border-red-600"
+                )}
               >
-                {formik.values.logo ? (
+                {formik.values.logo || logoUrl ? (
                   <Image
-                    src={formik.values.logo}
+                    src={logoUrl ?? ""}
                     alt="Event logo"
-                    className="w-full h-full object-cover rounded-full"
-                    layout="fill"
+                    className="w-full h-full object-contain rounded-full"
+                    height={24}
+                    width={24}
                   />
                 ) : (
                   <ImageIcon className="w-8 h-8 text-gray-400" />
@@ -86,35 +114,39 @@ export default function AddNewEvent() {
                 />
               </Label>
             </div>
+            <div className="text-center text-xs text-red-600">
+              {formik.touched.logo && formik.errors.logo}
+            </div>
           </div>
-          <div>
-            <Label htmlFor="name">Event Name</Label>
-            <Input
-              id="name"
-              name="name"
-              value={formik.values.name}
-              onChange={formik.handleChange}
-              placeholder="Enter event name"
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="title">Event Title</Label>
-            <Input
-              id="title"
-              name="title"
-              value={formik.values.title}
-              onChange={formik.handleChange}
-              placeholder="Enter event title"
-              required
-            />
-          </div>
+          <TextInput
+            id="name"
+            name="name"
+            label="Event Name"
+            value={formik.values.name}
+            onChange={formik.handleChange}
+            placeholder="Enter event name"
+            errorMessage={(formik.touched.name && formik.errors.name) || ""}
+          />
+
+          <TextInput
+            id="title"
+            name="title"
+            label="Event Title"
+            value={formik.values.title}
+            onChange={formik.handleChange}
+            placeholder="Enter event title"
+            errorMessage={(formik.touched.title && formik.errors.title) || ""}
+          />
           <div>
             <Label htmlFor="organizationUnit">Organization Unit</Label>
             <Select
               name="organizationUnit"
-              value={formik.values.organizationUnit}
-              onValueChange={formik.handleChange}
+              defaultValue={formik.values.organizationUnit}
+              onValueChange={(value) => {
+                console.log(value);
+                formik.setFieldValue("organizationUnit", value);
+                formik.setFieldTouched("organizationUnit", true);
+              }}
             >
               <SelectTrigger id="organizationUnit">
                 <SelectValue placeholder="Select organization unit" />
@@ -125,6 +157,10 @@ export default function AddNewEvent() {
                 <SelectItem value="unit3">Unit 3</SelectItem>
               </SelectContent>
             </Select>
+            <div className="text-xs text-red-600">
+              {formik.touched.organizationUnit &&
+                formik.errors.organizationUnit}
+            </div>
           </div>
           <div>
             <Label htmlFor="description">Description</Label>
@@ -136,9 +172,12 @@ export default function AddNewEvent() {
               placeholder="Enter a brief description of the event"
               rows={3}
             />
+            <div className="text-xs text-red-600">
+              {formik.touched.description && formik.errors.description}
+            </div>
           </div>
-          <Button type="submit" className="w-full">
-            Add Event
+          <Button type="submit" className="w-full" disabled={isUploading}>
+            {isUploading ? <Spinner /> : "Add Event"}
           </Button>
         </form>
       </DialogContent>

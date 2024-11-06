@@ -1,25 +1,33 @@
 import {
   ACCESS_KEY_ID,
-  ACCOUNT_ID,
   BUCKET_NAME,
+  R2_ENDPOINT,
   SECRET_ACCESS_KEY,
 } from "../envs";
-import * as AWS from "aws-sdk";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
-const s3Client = new AWS.S3({
-  endpoint: `https://${ACCOUNT_ID}.r2.cloudflarestorage.com`,
-  accessKeyId: ACCESS_KEY_ID,
-  secretAccessKey: SECRET_ACCESS_KEY, // Use the secret key directly
-  signatureVersion: "v4",
-  region: "auto", // Cloudflare R2 doesn't use regions, but this is required by the SDK
+const s3Client = new S3Client({
+  region: "auto",
+  endpoint: R2_ENDPOINT,
+  credentials: {
+    accessKeyId: ACCESS_KEY_ID,
+    secretAccessKey: SECRET_ACCESS_KEY,
+  },
+  forcePathStyle: true,
 });
 
 export const uploadFile = async (file: Buffer, key: string) => {
-  const params = {
-    Bucket: BUCKET_NAME,
-    Key: key,
-    Body: file,
-  };
-
-  return s3Client.upload(params).promise();
+  try {
+    await s3Client.send(
+      new PutObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+        Body: file,
+        ACL: "public-read",
+      })
+    );
+  } catch (error) {
+    console.error("Error uploading file: ", error);
+    throw error;
+  }
 };
