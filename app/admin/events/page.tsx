@@ -1,11 +1,13 @@
-import { WithAuth } from "@/components/withAuth";
+// "use server";
+// import { WithAuth } from "@/components/withAuth";
+import { AdminEventsPage } from "@/features/events/components/eventPage";
 import prisma from "@/lib/prisma";
-import { Role } from "@prisma/client";
+// import { Role } from "@prisma/client";
 
-const AdminEventsPage = async () => {
+async function EventsPage(): Promise<JSX.Element> {
   const events = await prisma.event.findMany();
-  console.log(events);
-  return <></>;
-};
 
-export default WithAuth(AdminEventsPage, [Role.admin, Role.content]);
+  return <AdminEventsPage events={events} />;
+}
+
+export default EventsPage;

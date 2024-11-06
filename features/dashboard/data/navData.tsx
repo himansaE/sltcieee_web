@@ -9,6 +9,8 @@ import {
   Frame,
   PieChart,
   Map as MapIcon,
+  HomeIcon,
+  Users,
 } from "lucide-react";
 
 export const navData = {
@@ -139,3 +141,26 @@ export const navData = {
     },
   ],
 };
+
+export const navLinks = [
+  {
+    title: "Dashboard",
+    url: "admin/dashboard",
+    icon: HomeIcon,
+  },
+  {
+    title: "Articles",
+    url: "admin/articles",
+    icon: BookOpen,
+  },
+  {
+    title: "Users",
+    url: "admin/users",
+    icon: Users,
+  },
+  {
+    title: "Settings",
+    url: "admin/settings",
+    icon: Settings2,
+  },
+];
