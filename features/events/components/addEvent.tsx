@@ -16,7 +16,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { PlusCircle, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
@@ -28,8 +27,12 @@ import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { uploadFile } from "@/lib/api/uploadFile";
 import Spinner from "@/components/ui/spinner";
+import { createEvent } from "@/lib/api/events.Fn";
+import { toast } from "sonner";
 
 export default function AddNewEvent() {
+  const [isOpened, setIsOpened] = useState(false);
+
   const formik = useFormik({
     initialValues: {
       logo: null,
@@ -44,15 +47,25 @@ export default function AddNewEvent() {
         formik.setFieldError("logo", "Event logo is required");
         return;
       }
-      uploadFileMutation({
+      const data = await uploadFileMutation({
         buffer: values.logo,
         key: (values.logo as File)?.name ?? "",
+      });
+
+      await createEventMutation({
+        title: values.title,
+        organizationUnitId: values.organizationUnit,
+        description: values.description,
+        image: data.filename,
       });
     },
   });
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files?.length) return;
+    if (isCreatingEvent || isUploading) return;
+
     const file = event.target.files?.[0];
     if (file) {
       if (logoUrl) URL.revokeObjectURL(logoUrl);
@@ -61,21 +74,34 @@ export default function AddNewEvent() {
     }
   };
 
-  const { mutate: uploadFileMutation, isPending: isUploading } = useMutation({
-    mutationFn: uploadFile,
-    onSuccess: () => {
-      alert("Event added successfully");
-    },
-  });
+  const { mutateAsync: uploadFileMutation, isPending: isUploading } =
+    useMutation({
+      mutationFn: uploadFile,
+    });
+
+  const { mutate: createEventMutation, isPending: isCreatingEvent } =
+    useMutation({
+      mutationFn: createEvent,
+      onSuccess: () => {
+        toast.success("Event has been created.");
+        formik.resetForm();
+        setLogoUrl(null);
+      },
+      onError: (error) => {
+        toast.error(error.message, {});
+      },
+    });
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add New Event
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpened} onOpenChange={setIsOpened}>
+      <Button
+        onClick={() => {
+          setIsOpened(true);
+        }}
+      >
+        <PlusCircle className="mr-2 h-4 w-4" />
+        Add New Event
+      </Button>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add New Event</DialogTitle>
@@ -126,6 +152,7 @@ export default function AddNewEvent() {
             onChange={formik.handleChange}
             placeholder="Enter event name"
             errorMessage={(formik.touched.name && formik.errors.name) || ""}
+            disabled={isCreatingEvent || isUploading}
           />
 
           <TextInput
@@ -136,6 +163,7 @@ export default function AddNewEvent() {
             onChange={formik.handleChange}
             placeholder="Enter event title"
             errorMessage={(formik.touched.title && formik.errors.title) || ""}
+            disabled={isCreatingEvent || isUploading}
           />
           <div>
             <Label htmlFor="organizationUnit">Organization Unit</Label>
@@ -147,6 +175,7 @@ export default function AddNewEvent() {
                 formik.setFieldValue("organizationUnit", value);
                 formik.setFieldTouched("organizationUnit", true);
               }}
+              disabled={isCreatingEvent || isUploading}
             >
               <SelectTrigger id="organizationUnit">
                 <SelectValue placeholder="Select organization unit" />
@@ -171,13 +200,18 @@ export default function AddNewEvent() {
               onChange={formik.handleChange}
               placeholder="Enter a brief description of the event"
               rows={3}
+              disabled={isCreatingEvent || isUploading}
             />
             <div className="text-xs text-red-600">
               {formik.touched.description && formik.errors.description}
             </div>
           </div>
-          <Button type="submit" className="w-full" disabled={isUploading}>
-            {isUploading ? <Spinner /> : "Add Event"}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isUploading || isCreatingEvent}
+          >
+            {isUploading || isCreatingEvent ? <Spinner /> : "Add Event"}
           </Button>
         </form>
       </DialogContent>
