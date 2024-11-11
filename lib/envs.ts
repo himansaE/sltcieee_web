@@ -2,7 +2,7 @@ const getEnvVariable = (name: string, fallback?: string): string => {
   const value = process.env[name] ?? fallback;
   if (!value) {
     console.error(`Environment variable ${name} is not set`);
-    return "";
+    return fallback ?? "";
   }
   return value;
 };

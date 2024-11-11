@@ -4,7 +4,11 @@ import {
   R2_ENDPOINT,
   SECRET_ACCESS_KEY,
 } from "../envs";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+  HeadObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
 
 const s3Client = new S3Client({
   region: "auto",
@@ -29,5 +33,19 @@ export const uploadFile = async (file: Buffer, key: string) => {
   } catch (error) {
     console.error("Error uploading file: ", error);
     throw error;
+  }
+};
+
+export const fileExists = async (key: string): Promise<boolean> => {
+  try {
+    await s3Client.send(
+      new HeadObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: key,
+      })
+    );
+    return true;
+  } catch {
+    return false;
   }
 };

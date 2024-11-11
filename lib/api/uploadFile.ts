@@ -11,8 +11,9 @@ export const uploadFile = async ({
   formData.append("file", buffer, key);
 
   const req = await Request<{
-    message: string;
     filename: string;
+    optimized: boolean;
+    success: boolean;
   }>({
     method: "POST",
     url: "/api/admin/upload",
@@ -22,7 +23,8 @@ export const uploadFile = async ({
     },
   });
 
-  if (req.data.message !== "Success") {
+  console.log(req.data);
+  if (req.data.success !== true) {
     throw new Error("File upload failed");
   }
   return req.data;

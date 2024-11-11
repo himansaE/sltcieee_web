@@ -11,8 +11,16 @@ export const eventValidationSchema = Yup.object({
         value && ["image/jpeg", "image/png"].includes((value as File).type)
       ); // Only allow jpeg or png files
     }),
-  name: Yup.string().required("Event name is required"),
   title: Yup.string().required("Event title is required"),
   organizationUnit: Yup.string().required("Organization unit is required"),
   description: Yup.string().required("Event description is required"),
+});
+
+// extend from eventValidationSchema
+
+export const eventReqValidationSchema = eventValidationSchema.shape({
+  image: Yup.string().required(),
+  logo: Yup.mixed().notRequired(),
+  organizationUnit: Yup.mixed().notRequired(),
+  organizationUnitId: Yup.string().required(),
 });

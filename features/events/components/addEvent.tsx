@@ -29,6 +29,7 @@ import { uploadFile } from "@/lib/api/uploadFile";
 import Spinner from "@/components/ui/spinner";
 import { createEvent } from "@/lib/api/events.Fn";
 import { toast } from "sonner";
+import { useOrganizationUnits } from "@/hooks/useOrganizationUnit";
 
 export default function AddNewEvent() {
   const [isOpened, setIsOpened] = useState(false);
@@ -36,13 +37,14 @@ export default function AddNewEvent() {
   const formik = useFormik({
     initialValues: {
       logo: null,
-      name: "",
       title: "",
       organizationUnit: "",
       description: "",
     },
     validationSchema: eventValidationSchema,
     onSubmit: async (values) => {
+      let msg = toast.loading("Uploading Event Logo...");
+
       if (!values.logo) {
         formik.setFieldError("logo", "Event logo is required");
         return;
@@ -50,14 +52,34 @@ export default function AddNewEvent() {
       const data = await uploadFileMutation({
         buffer: values.logo,
         key: (values.logo as File)?.name ?? "",
+      }).catch(() => {
+        toast.error("An error occurred while uploading the event logo.", {
+          id: msg,
+        });
+        return null;
       });
 
+      if (!data) return;
+
+      msg = toast.loading("Creating Event...", {
+        id: msg,
+      });
       await createEventMutation({
         title: values.title,
         organizationUnitId: values.organizationUnit,
         description: values.description,
         image: data.filename,
-      });
+      })
+        .then(() => {
+          toast.success("Event has been created.", {
+            id: msg,
+          });
+        })
+        .catch(() => {
+          toast.error("An error occurred while creating the event.", {
+            id: msg,
+          });
+        });
     },
   });
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
@@ -74,21 +96,25 @@ export default function AddNewEvent() {
     }
   };
 
+  const {
+    data: organizationUnits,
+    isLoading: isOrganizationUnitsLoading,
+    isError: isOrganizationUnitsError,
+    refetch: refetchOrganizationUnits,
+  } = useOrganizationUnits(false);
+
   const { mutateAsync: uploadFileMutation, isPending: isUploading } =
     useMutation({
       mutationFn: uploadFile,
     });
 
-  const { mutate: createEventMutation, isPending: isCreatingEvent } =
+  const { mutateAsync: createEventMutation, isPending: isCreatingEvent } =
     useMutation({
       mutationFn: createEvent,
       onSuccess: () => {
-        toast.success("Event has been created.");
+        setIsOpened(false);
         formik.resetForm();
         setLogoUrl(null);
-      },
-      onError: (error) => {
-        toast.error(error.message, {});
       },
     });
 
@@ -106,114 +132,123 @@ export default function AddNewEvent() {
         <DialogHeader>
           <DialogTitle>Add New Event</DialogTitle>
         </DialogHeader>
-        <form onSubmit={formik.handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="logo" className="block mb-2">
-              Event Logo
-            </Label>
-            <div className="flex items-center justify-center">
-              <Label
-                htmlFor="logo"
-                className={cn(
-                  "cursor-pointer flex items-center justify-center w-24 h-24 rounded-full bg-gray-100 border-2 border-gray-300 border-dashed hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary",
-                  formik.errors.logo && "border-red-600"
-                )}
-              >
-                {formik.values.logo || logoUrl ? (
-                  <Image
-                    src={logoUrl ?? ""}
-                    alt="Event logo"
-                    className="w-full h-full object-contain rounded-full"
-                    height={24}
-                    width={24}
-                  />
-                ) : (
-                  <ImageIcon className="w-8 h-8 text-gray-400" />
-                )}
-                <Input
-                  id="logo"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                  aria-label="Upload event logo"
-                />
-              </Label>
-            </div>
-            <div className="text-center text-xs text-red-600">
-              {formik.touched.logo && formik.errors.logo}
-            </div>
+        {isOrganizationUnitsLoading ? (
+          <div className="flex justify-center items-center py-10">
+            <Spinner size={30} />
           </div>
-          <TextInput
-            id="name"
-            name="name"
-            label="Event Name"
-            value={formik.values.name}
-            onChange={formik.handleChange}
-            placeholder="Enter event name"
-            errorMessage={(formik.touched.name && formik.errors.name) || ""}
-            disabled={isCreatingEvent || isUploading}
-          />
-
-          <TextInput
-            id="title"
-            name="title"
-            label="Event Title"
-            value={formik.values.title}
-            onChange={formik.handleChange}
-            placeholder="Enter event title"
-            errorMessage={(formik.touched.title && formik.errors.title) || ""}
-            disabled={isCreatingEvent || isUploading}
-          />
-          <div>
-            <Label htmlFor="organizationUnit">Organization Unit</Label>
-            <Select
-              name="organizationUnit"
-              defaultValue={formik.values.organizationUnit}
-              onValueChange={(value) => {
-                console.log(value);
-                formik.setFieldValue("organizationUnit", value);
-                formik.setFieldTouched("organizationUnit", true);
+        ) : isOrganizationUnitsError ? (
+          <div className="text-center text-red-600 flex flex-col gap-5 justify-center items-center py-10">
+            An error occurred while fetching organization units.
+            <Button
+              onClick={() => {
+                refetchOrganizationUnits();
               }}
-              disabled={isCreatingEvent || isUploading}
+              className="w-min rounded-full px-6"
             >
-              <SelectTrigger id="organizationUnit">
-                <SelectValue placeholder="Select organization unit" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="unit1">Unit 1</SelectItem>
-                <SelectItem value="unit2">Unit 2</SelectItem>
-                <SelectItem value="unit3">Unit 3</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="text-xs text-red-600">
-              {formik.touched.organizationUnit &&
-                formik.errors.organizationUnit}
-            </div>
+              Retry
+            </Button>
           </div>
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              name="description"
-              value={formik.values.description}
+        ) : (
+          <form onSubmit={formik.handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="logo" className="block mb-2">
+                Event Logo
+              </Label>
+              <div className="flex items-center justify-center">
+                <Label
+                  htmlFor="logo"
+                  className={cn(
+                    "cursor-pointer flex items-center justify-center w-24 h-24 rounded-full bg-gray-100 border-2 border-gray-300 border-dashed hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary",
+                    formik.errors.logo && "border-red-600"
+                  )}
+                >
+                  {formik.values.logo || logoUrl ? (
+                    <Image
+                      src={logoUrl ?? ""}
+                      alt="Event logo"
+                      className="w-full h-full object-contain rounded-full"
+                      height={24}
+                      width={24}
+                    />
+                  ) : (
+                    <ImageIcon className="w-8 h-8 text-gray-400" />
+                  )}
+                  <Input
+                    id="logo"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    aria-label="Upload event logo"
+                    disabled={isCreatingEvent || isUploading}
+                  />
+                </Label>
+              </div>
+              <div className="text-center text-xs text-red-600">
+                {formik.touched.logo && formik.errors.logo}
+              </div>
+            </div>
+
+            <TextInput
+              id="title"
+              name="title"
+              label="Event Title"
+              value={formik.values.title}
               onChange={formik.handleChange}
-              placeholder="Enter a brief description of the event"
-              rows={3}
+              placeholder="Enter event title"
+              errorMessage={(formik.touched.title && formik.errors.title) || ""}
               disabled={isCreatingEvent || isUploading}
             />
-            <div className="text-xs text-red-600">
-              {formik.touched.description && formik.errors.description}
+            <div>
+              <Label htmlFor="organizationUnit">Organization Unit</Label>
+              <Select
+                name="organizationUnit"
+                value={formik.values.organizationUnit}
+                onValueChange={(value) => {
+                  formik.setFieldValue("organizationUnit", value);
+                }}
+                disabled={isCreatingEvent || isUploading}
+              >
+                <SelectTrigger id="organizationUnit">
+                  <SelectValue placeholder="Select organization unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(organizationUnits ?? []).map((unit) => (
+                    <SelectItem key={unit.id} value={unit.id}>
+                      {unit.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="text-xs text-red-600">
+                {formik.touched.organizationUnit &&
+                  formik.errors.organizationUnit}
+              </div>
             </div>
-          </div>
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isUploading || isCreatingEvent}
-          >
-            {isUploading || isCreatingEvent ? <Spinner /> : "Add Event"}
-          </Button>
-        </form>
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                name="description"
+                value={formik.values.description}
+                onChange={formik.handleChange}
+                placeholder="Enter a brief description of the event"
+                rows={3}
+                disabled={isCreatingEvent || isUploading}
+              />
+              <div className="text-xs text-red-600">
+                {formik.touched.description && formik.errors.description}
+              </div>
+            </div>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isUploading || isCreatingEvent}
+            >
+              {isUploading || isCreatingEvent ? <Spinner /> : "Add Event"}
+            </Button>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );

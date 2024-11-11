@@ -97,5 +97,5 @@ model OrganizationUnit{
   image       String
   createdAt   DateTime
   @@map("organizationUnit")
-  Event Event[]
+  events Event[]
 }
