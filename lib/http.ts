@@ -1,8 +1,8 @@
 import axios from "axios";
-import { BACKEND_BASE_URL } from "./envs";
+import { ClientEnv } from "./env/client";
 
 const Request = axios.create({
-  baseURL: BACKEND_BASE_URL,
+  baseURL: ClientEnv.BACKEND.BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },

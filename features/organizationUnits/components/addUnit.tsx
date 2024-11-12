@@ -23,7 +23,7 @@ import { toast } from "sonner";
 import { organizationUnitValidationSchema } from "@/lib/validation/organizationUnit";
 import { createOrganizationUnit } from "@/lib/api/organizationUnitFn";
 
-export default function AddNewOrganizationUnit() {
+export default function AddNewOrganizationUnit(props: { refresh: () => void }) {
   const [isOpened, setIsOpened] = useState(false);
 
   const formik = useFormik({
@@ -95,8 +95,10 @@ export default function AddNewOrganizationUnit() {
   } = useMutation({
     mutationFn: createOrganizationUnit,
     onSuccess: () => {
+      props.refresh();
       formik.resetForm();
       setLogoUrl(null);
+      setIsOpened(false);
     },
   });
 

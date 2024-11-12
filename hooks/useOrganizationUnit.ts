@@ -1,9 +1,19 @@
-import { getOrganizationUnits } from "@/lib/api/organizationUnitFn";
-import { useQuery } from "@tanstack/react-query";
+import {
+  getOrganizationUnits,
+  type OrganizationUnitReturn,
+} from "@/lib/api/organizationUnitFn";
+import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 
-export const useOrganizationUnits = (withEvents = false) => {
+interface UseOrganizationUnitsProps<T extends boolean> {
+  withEvents: T;
+  initialData?: OrganizationUnitReturn<T>;
+}
+export function useOrganizationUnits<T extends boolean>(
+  data: UseOrganizationUnitsProps<T>
+): UseQueryResult<OrganizationUnitReturn<T>> {
   return useQuery({
-    queryKey: ["organizationUnits", withEvents],
-    queryFn: () => getOrganizationUnits(withEvents),
+    queryKey: ["organizationUnits", data.withEvents],
+    queryFn: () => getOrganizationUnits(data.withEvents),
+    initialData: data.initialData,
   });
-};
+}

@@ -1,21 +1,16 @@
 import {
-  ACCESS_KEY_ID,
-  BUCKET_NAME,
-  R2_ENDPOINT,
-  SECRET_ACCESS_KEY,
-} from "../envs";
-import {
   HeadObjectCommand,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
+import { ServerEnv } from "../env/server";
 
 const s3Client = new S3Client({
   region: "auto",
-  endpoint: R2_ENDPOINT,
+  endpoint: ServerEnv.R2.ENDPOINT,
   credentials: {
-    accessKeyId: ACCESS_KEY_ID,
-    secretAccessKey: SECRET_ACCESS_KEY,
+    accessKeyId: ServerEnv.R2.ACCESS_KEY_ID,
+    secretAccessKey: ServerEnv.R2.SECRET_ACCESS_KEY,
   },
   forcePathStyle: true,
 });
@@ -24,7 +19,7 @@ export const uploadFile = async (file: Buffer, key: string) => {
   try {
     await s3Client.send(
       new PutObjectCommand({
-        Bucket: BUCKET_NAME,
+        Bucket: ServerEnv.R2.BUCKET_NAME,
         Key: key,
         Body: file,
         ACL: "public-read",
@@ -40,7 +35,7 @@ export const fileExists = async (key: string): Promise<boolean> => {
   try {
     await s3Client.send(
       new HeadObjectCommand({
-        Bucket: BUCKET_NAME,
+        Bucket: ServerEnv.R2.BUCKET_NAME,
         Key: key,
       })
     );

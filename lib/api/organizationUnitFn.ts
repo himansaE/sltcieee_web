@@ -18,9 +18,9 @@ export const createOrganizationUnit = async (
   return res.data;
 };
 
-type OrganizationUnitWithEvents = OrganizationUnit & { events: Event[] };
+export type OrganizationUnitWithEvents = OrganizationUnit & { events: Event[] };
 
-type OrganizationUnitReturn<T extends boolean> = T extends true
+export type OrganizationUnitReturn<T extends boolean> = T extends true
   ? OrganizationUnitWithEvents[]
   : OrganizationUnit[];
 

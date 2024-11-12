@@ -101,7 +101,9 @@ export default function AddNewEvent() {
     isLoading: isOrganizationUnitsLoading,
     isError: isOrganizationUnitsError,
     refetch: refetchOrganizationUnits,
-  } = useOrganizationUnits(false);
+  } = useOrganizationUnits({
+    withEvents: false,
+  });
 
   const { mutateAsync: uploadFileMutation, isPending: isUploading } =
     useMutation({
