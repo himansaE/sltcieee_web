@@ -85,7 +85,7 @@ model Event{
   image       String
   createdAt   DateTime
   organizationUnitId String
-  OrganizationUnit OrganizationUnit @relation(fields: [organizationUnitId], references: [id])
+  organizationUnit OrganizationUnit @relation(fields: [organizationUnitId], references: [id])
   @@map("event")
 }
 

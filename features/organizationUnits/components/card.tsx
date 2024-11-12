@@ -32,7 +32,9 @@ export const OrganizationUnitCard: React.FC<{
         </Badge>
       </CardHeader>
       <CardContent className="flex-grow">
-        <CardTitle className="text-2xl font-bold mb-2">{unit.title}</CardTitle>
+        <CardTitle className="text-2xl font-bold mb-2 text-black">
+          {unit.title}
+        </CardTitle>
         <CardDescription className="text-sm text-muted-foreground mb-4">
           {unit.description}
         </CardDescription>

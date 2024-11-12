@@ -5,6 +5,7 @@ import { OrganizationUnitCard } from "./card";
 import type { OrganizationUnitWithEvents } from "@lib/api/organizationUnitFn";
 import { useOrganizationUnits } from "@/hooks/useOrganizationUnit";
 import AddNewOrganizationUnit from "./addUnit";
+import { DivList } from "@/components/widgets/divList";
 
 type AdminOrganizationUnitPageProps = {
   units: OrganizationUnitWithEvents[];
@@ -46,6 +47,7 @@ export const AdminOrganizationUnitPage: React.FC<
           {units.map((unit) => (
             <OrganizationUnitCard unit={unit} key={unit.id} />
           ))}
+          <DivList count={5} />
         </div>
       )}
     </div>
