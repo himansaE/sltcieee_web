@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getImageUrl } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import Image from "next/image";
 
 interface EventCardProps {
   event: EventWithOrganization;
@@ -14,6 +15,13 @@ export const EventCard = ({ event }: EventCardProps) => {
       {/* Cover Image with Gradient Overlay */}
       <div className="relative h-48 w-full overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
+        <Image
+          src={getImageUrl(event.coverImage)}
+          layout="fill"
+          objectFit="cover"
+          alt={event.title}
+          unoptimized
+        />
       </div>
 
       {/* Content Section */}

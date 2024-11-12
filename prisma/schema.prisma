@@ -83,6 +83,7 @@ model Event{
   title       String
   description String
   image       String
+  coverImage  String
   createdAt   DateTime
   organizationUnitId String
   organizationUnit OrganizationUnit @relation(fields: [organizationUnitId], references: [id])

@@ -1,5 +1,10 @@
-"use client";
-
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,84 +16,78 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { PlusCircle, Image as ImageIcon } from "lucide-react";
-import Image from "next/image";
 import { useFormik } from "formik";
-import { useState } from "react";
-import { TextInput } from "@/components/widgets/textInput";
-import { eventValidationSchema } from "@/lib/validation/event";
-import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
-import { uploadFile } from "@/lib/api/uploadFile";
-import Spinner from "@/components/ui/spinner";
+import { ImageIcon, Plus, X } from "lucide-react";
+import Image from "next/image";
 import { createEvent } from "@/lib/api/events.Fn";
 import { toast } from "sonner";
 import { useOrganizationUnits } from "@/hooks/useOrganizationUnit";
+import Spinner from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
+import { uploadFile } from "@/lib/api/uploadFile";
+import { useState } from "react";
+import { eventValidationSchema } from "@/lib/validation/event";
 
 export default function AddNewEvent() {
   const [isOpened, setIsOpened] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
 
   const formik = useFormik({
     initialValues: {
       logo: null,
+      coverImage: null,
       title: "",
       organizationUnit: "",
       description: "",
     },
     validationSchema: eventValidationSchema,
     onSubmit: async (values) => {
-      let msg = toast.loading("Uploading Event Logo...");
+      let msg = toast.loading("Uploading images...");
 
-      if (!values.logo) {
-        formik.setFieldError("logo", "Event logo is required");
+      if (!values.logo || !values.coverImage) {
+        toast.error("Both logo and cover image are required", { id: msg });
         return;
       }
-      const data = await uploadFileMutation({
-        buffer: values.logo,
-        key: (values.logo as File)?.name ?? "",
-      }).catch(() => {
-        toast.error("An error occurred while uploading the event logo.", {
-          id: msg,
-        });
-        return null;
-      });
 
-      if (!data) return;
+      try {
+        const [logoData, coverData] = await Promise.all([
+          uploadFileMutation({
+            buffer: values.logo,
+            key: (values.logo as File)?.name ?? "",
+          }),
+          uploadFileMutation({
+            buffer: values.coverImage,
+            key: (values.coverImage as File)?.name ?? "",
+          }),
+        ]);
 
-      msg = toast.loading("Creating Event...", {
-        id: msg,
-      });
-      await createEventMutation({
-        title: values.title,
-        organizationUnitId: values.organizationUnit,
-        description: values.description,
-        image: data.filename,
-      })
-        .then(() => {
-          toast.success("Event has been created.", {
-            id: msg,
-          });
-        })
-        .catch(() => {
-          toast.error("An error occurred while creating the event.", {
-            id: msg,
-          });
+        msg = toast.loading("Creating Event...", { id: msg });
+        await createEventMutation({
+          title: values.title,
+          organizationUnitId: values.organizationUnit,
+          description: values.description,
+          image: logoData.filename,
+          coverImage: coverData.filename,
         });
+
+        toast.success("Event has been created.", { id: msg });
+        setIsOpened(false);
+        formik.resetForm();
+        setLogoUrl(null);
+        setCoverImageUrl(null);
+      } catch (error) {
+        console.error(error);
+        toast.error("An error occurred. Please try again.", { id: msg });
+      }
     },
   });
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files?.length) return;
-    if (isCreatingEvent || isUploading) return;
+  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files?.length || isLoading) return;
 
-    const file = event.target.files?.[0];
+    const file = event.target.files[0];
     if (file) {
       if (logoUrl) URL.revokeObjectURL(logoUrl);
       setLogoUrl(URL.createObjectURL(file));
@@ -96,14 +95,21 @@ export default function AddNewEvent() {
     }
   };
 
-  const {
-    data: organizationUnits,
-    isLoading: isOrganizationUnitsLoading,
-    isError: isOrganizationUnitsError,
-    refetch: refetchOrganizationUnits,
-  } = useOrganizationUnits({
-    withEvents: false,
-  });
+  const handleCoverImageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (!event.target.files?.length || isLoading) return;
+
+    const file = event.target.files[0];
+    if (file) {
+      if (coverImageUrl) URL.revokeObjectURL(coverImageUrl);
+      setCoverImageUrl(URL.createObjectURL(file));
+      formik.setFieldValue("coverImage", file);
+    }
+  };
+
+  const { data: organizationUnits, isLoading: isOrganizationUnitsLoading } =
+    useOrganizationUnits({ withEvents: false });
 
   const { mutateAsync: uploadFileMutation, isPending: isUploading } =
     useMutation({
@@ -113,144 +119,206 @@ export default function AddNewEvent() {
   const { mutateAsync: createEventMutation, isPending: isCreatingEvent } =
     useMutation({
       mutationFn: createEvent,
-      onSuccess: () => {
-        setIsOpened(false);
-        formik.resetForm();
-        setLogoUrl(null);
-      },
     });
+
+  const isLoading =
+    isOrganizationUnitsLoading || isUploading || isCreatingEvent;
 
   return (
     <Dialog open={isOpened} onOpenChange={setIsOpened}>
-      <Button
-        onClick={() => {
-          setIsOpened(true);
-        }}
-      >
-        <PlusCircle className="mr-2 h-4 w-4" />
-        Add New Event
-      </Button>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Add New Event</DialogTitle>
+      <DialogTrigger asChild>
+        <Button>
+          <Plus className="mr-2 h-4 w-4" /> Add New Event
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[625px] max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="p-6 pb-4">
+          <DialogTitle>Create New Event</DialogTitle>
         </DialogHeader>
-        {isOrganizationUnitsLoading ? (
-          <div className="flex justify-center items-center py-10">
-            <Spinner size={30} />
-          </div>
-        ) : isOrganizationUnitsError ? (
-          <div className="text-center text-red-600 flex flex-col gap-5 justify-center items-center py-10">
-            An error occurred while fetching organization units.
-            <Button
-              onClick={() => {
-                refetchOrganizationUnits();
-              }}
-              className="w-min rounded-full px-6"
-            >
-              Retry
-            </Button>
-          </div>
-        ) : (
-          <form onSubmit={formik.handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="logo" className="block mb-2">
-                Event Logo
-              </Label>
-              <div className="flex items-center justify-center">
-                <Label
-                  htmlFor="logo"
-                  className={cn(
-                    "cursor-pointer flex items-center justify-center w-24 h-24 rounded-full bg-gray-100 border-2 border-gray-300 border-dashed hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary",
-                    formik.errors.logo && "border-red-600"
-                  )}
-                >
-                  {formik.values.logo || logoUrl ? (
-                    <Image
-                      src={logoUrl ?? ""}
-                      alt="Event logo"
-                      className="w-full h-full object-contain rounded-full"
-                      height={24}
-                      width={24}
+
+        <div className="flex-1 overflow-y-auto px-6">
+          <form onSubmit={formik.handleSubmit} className="space-y-6">
+            {/* Image Upload Section */}
+            <div className="relative w-full h-64 rounded-lg my-2 ">
+              <div
+                className={cn(
+                  "w-full h-full bg-cover bg-center bg-gray-100 rounded-lg overflow-hidden ",
+                  formik.touched.coverImage &&
+                    formik.errors.coverImage &&
+                    "ring-2 ring-red-500"
+                )}
+                style={{
+                  backgroundImage: coverImageUrl
+                    ? `url(${coverImageUrl})`
+                    : "none",
+                }}
+              >
+                <div className="absolute inset-0 bg-black/20" />
+                {!coverImageUrl ? (
+                  <label className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-gray-200/50 transition-colors">
+                    <div className="text-center">
+                      <ImageIcon className="mx-auto h-8 w-8 text-gray-400" />
+                      <span className="mt-2 block text-sm font-medium text-gray-600">
+                        Upload Cover Image
+                      </span>
+                      <span className="mt-1 text-xs text-gray-500">
+                        JPG, PNG or WebP (max 5MB)
+                      </span>
+                    </div>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleCoverImageChange}
+                      disabled={isLoading || isUploading}
                     />
-                  ) : (
-                    <ImageIcon className="w-8 h-8 text-gray-400" />
-                  )}
-                  <Input
-                    id="logo"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="hidden"
-                    aria-label="Upload event logo"
-                    disabled={isCreatingEvent || isUploading}
-                  />
-                </Label>
-              </div>
-              <div className="text-center text-xs text-red-600">
-                {formik.touched.logo && formik.errors.logo}
+                  </label>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      URL.revokeObjectURL(coverImageUrl);
+                      setCoverImageUrl(null);
+                      formik.setFieldValue("coverImage", null);
+                    }}
+                    className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 text-white hover:bg-black/70"
+                    disabled={isLoading || isUploading}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+
+                {/* Logo Upload */}
+                <div className="absolute left-8 -bottom-6">
+                  <div
+                    className={cn(
+                      "relative w-24 h-24 rounded-full  bg-white shadow-lg ring-4",
+                      formik.touched.logo && formik.errors.logo
+                        ? "ring-red-500"
+                        : "ring-white"
+                    )}
+                  >
+                    {logoUrl ? (
+                      <>
+                        <Image
+                          src={logoUrl}
+                          alt="Logo preview"
+                          fill
+                          className="object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            URL.revokeObjectURL(logoUrl);
+                            setLogoUrl(null);
+                            formik.setFieldValue("logo", null);
+                          }}
+                          className="absolute top-1 right-1 p-1 rounded-full bg-black/50 text-white hover:bg-black/70"
+                          disabled={isLoading || isUploading}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </>
+                    ) : (
+                      <label className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-gray-50 rounded-full">
+                        <div className="text-center">
+                          <ImageIcon className="mx-auto h-6 w-6 text-gray-400" />
+                          <span className="mt-1 block text-xs font-medium text-gray-600">
+                            Logo
+                          </span>
+                        </div>
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept="image/jpeg,image/png,image/webp"
+                          onChange={handleLogoChange}
+                          disabled={isLoading || isUploading}
+                        />
+                      </label>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
-            <TextInput
-              id="title"
-              name="title"
-              label="Event Title"
-              value={formik.values.title}
-              onChange={formik.handleChange}
-              placeholder="Enter event title"
-              errorMessage={(formik.touched.title && formik.errors.title) || ""}
-              disabled={isCreatingEvent || isUploading}
-            />
-            <div>
-              <Label htmlFor="organizationUnit">Organization Unit</Label>
-              <Select
-                name="organizationUnit"
-                value={formik.values.organizationUnit}
-                onValueChange={(value) => {
-                  formik.setFieldValue("organizationUnit", value);
-                }}
-                disabled={isCreatingEvent || isUploading}
-              >
-                <SelectTrigger id="organizationUnit">
-                  <SelectValue placeholder="Select organization unit" />
-                </SelectTrigger>
-                <SelectContent>
-                  {(organizationUnits ?? []).map((unit) => (
-                    <SelectItem key={unit.id} value={unit.id}>
-                      {unit.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="text-xs text-red-600">
+            {/* Form Fields */}
+            <div className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  {...formik.getFieldProps("title")}
+                  disabled={isLoading || isUploading}
+                  placeholder="Event Title"
+                />
+                {formik.touched.title && formik.errors.title && (
+                  <p className="text-sm text-red-500">{formik.errors.title}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="organizationUnit">Organization Unit</Label>
+                <Select
+                  value={formik.values.organizationUnit}
+                  onValueChange={(value) =>
+                    formik.setFieldValue("organizationUnit", value)
+                  }
+                  disabled={isLoading || isUploading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select organization unit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {organizationUnits?.map((unit) => (
+                      <SelectItem key={unit.id} value={unit.id}>
+                        {unit.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {formik.touched.organizationUnit &&
-                  formik.errors.organizationUnit}
+                  formik.errors.organizationUnit && (
+                    <p className="text-sm text-red-500">
+                      {formik.errors.organizationUnit}
+                    </p>
+                  )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  {...formik.getFieldProps("description")}
+                  disabled={isLoading || isUploading}
+                  placeholder="Event Description"
+                />
+                {formik.touched.description && formik.errors.description && (
+                  <p className="text-sm text-red-500">
+                    {formik.errors.description}
+                  </p>
+                )}
               </div>
             </div>
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                name="description"
-                value={formik.values.description}
-                onChange={formik.handleChange}
-                placeholder="Enter a brief description of the event"
-                rows={3}
-                disabled={isCreatingEvent || isUploading}
-              />
-              <div className="text-xs text-red-600">
-                {formik.touched.description && formik.errors.description}
-              </div>
-            </div>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isUploading || isCreatingEvent}
-            >
-              {isUploading || isCreatingEvent ? <Spinner /> : "Add Event"}
-            </Button>
           </form>
-        )}
+        </div>
+
+        <div className="flex justify-end gap-2 p-6 pt-4 border-t">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setIsOpened(false)}
+            disabled={isLoading || isUploading}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => formik.handleSubmit()}
+            disabled={isLoading || isUploading}
+          >
+            {isLoading && <Spinner className="mr-2" />}
+            Create Event
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -69,9 +69,10 @@ export async function POST(req: NextRequest) {
         description: data.description.trim(),
         image: data.image,
         organizationUnitId: data.organizationUnit,
+        coverImage: data.coverImage,
         slug,
         createdAt: new Date(),
-        OrganizationUnit: { connect: { id: data.organizationUnitId } },
+        organizationUnit: { connect: { id: data.organizationUnitId } },
       },
     });
 
@@ -96,7 +97,7 @@ export async function GET() {
         organizationUnitId: true,
         slug: true,
         createdAt: true,
-        OrganizationUnit: true,
+        organizationUnit: true,
       },
     });
 
