@@ -21,7 +21,7 @@ export const AdminOrganizationUnitPage: React.FC<
 
   return (
     <div className="px-5 py-4">
-      <div className="flex justify-between flex-row">
+      <div className="flex justify-between items-center flex-row">
         <h1 className="text-2xl font-bold">Manage Organization Units</h1>
         <AddNewOrganizationUnit refresh={refetchUnits} />
       </div>

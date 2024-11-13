@@ -21,7 +21,7 @@ export const AdminEventsPage: React.FC<AdminEventsPageProps> = ({
 
   return (
     <div className="px-5 py-4">
-      <div className="flex justify-between flex-row">
+      <div className="flex justify-between items-center flex-row">
         <h1 className="text-2xl font-bold">Manage Events</h1>
         <AddNewEvent />
       </div>

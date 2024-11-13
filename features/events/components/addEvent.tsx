@@ -73,6 +73,7 @@ export default function AddNewEvent() {
         });
 
         toast.success("Event has been created.", { id: msg });
+
         setIsOpened(false);
         formik.resetForm();
         setLogoUrl(null);
@@ -153,7 +154,7 @@ export default function AddNewEvent() {
                     : "none",
                 }}
               >
-                <div className="absolute inset-0 bg-black/20" />
+                <div className="absolute inset-0 bg-black/20 rounded-lg" />
                 {!coverImageUrl ? (
                   <label className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-gray-200/50 transition-colors">
                     <div className="text-center">
@@ -190,9 +191,23 @@ export default function AddNewEvent() {
 
                 {/* Logo Upload */}
                 <div className="absolute left-8 -bottom-6">
+                  {logoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        URL.revokeObjectURL(logoUrl);
+                        setLogoUrl(null);
+                        formik.setFieldValue("logo", null);
+                      }}
+                      className="absolute top-1 right-1 p-1 rounded-full bg-black/50 text-white hover:bg-black/70 z-10"
+                      disabled={isLoading || isUploading}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  )}
                   <div
                     className={cn(
-                      "relative w-24 h-24 rounded-full  bg-white shadow-lg ring-4",
+                      "relative w-24 h-24 rounded-full  bg-white shadow-lg ring-4 overflow-hidden",
                       formik.touched.logo && formik.errors.logo
                         ? "ring-red-500"
                         : "ring-white"
@@ -206,18 +221,6 @@ export default function AddNewEvent() {
                           fill
                           className="object-cover"
                         />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            URL.revokeObjectURL(logoUrl);
-                            setLogoUrl(null);
-                            formik.setFieldValue("logo", null);
-                          }}
-                          className="absolute top-1 right-1 p-1 rounded-full bg-black/50 text-white hover:bg-black/70"
-                          disabled={isLoading || isUploading}
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
                       </>
                     ) : (
                       <label className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-gray-50 rounded-full">

@@ -1,7 +1,5 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Sidebar,
@@ -18,9 +16,10 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { TopNav } from "./topnav";
-import { navData, navLinks } from "../data/navData";
+import { navLinks } from "../data/navData";
 import Image from "next/image";
 import { authClient } from "@/lib/auth/client";
+import Link from "next/link";
 // This is sample data.
 
 type AdminSideNavProps = {
@@ -67,9 +66,15 @@ export const AdminSideNav: React.FC<AdminSideNavProps> = (props) => {
             <SidebarGroupLabel>Platform</SidebarGroupLabel>
             <SidebarMenu>
               {navLinks.map((item) => (
-                <SidebarMenuButton tooltip={item.title} key={item.title}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  key={item.title}
+                  asChild
+                >
+                  <Link href={item.url}>
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                  </Link>
                 </SidebarMenuButton>
               ))}
             </SidebarMenu>

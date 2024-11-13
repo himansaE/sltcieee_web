@@ -50,7 +50,7 @@ export const EventCard = ({ event }: EventCardProps) => {
         </div>
 
         {/* Event Details */}
-        <div className="space-y-2 text-sm text-gray-600">
+        <div className="space-y-2 text-sm text-gray-600 mt-auto">
           <div className="flex items-center gap-2">
             <CalendarIcon className="h-4 w-4" />
             <span>{format(new Date(event.createdAt), "PPP")}</span>
