@@ -69,7 +69,7 @@ function RegisterAdmin() {
               Create an Admin Account
             </h2>
             <p className="mt-2 text-sm text-gray-600">
-              Register to manage your newsletter
+              You&apos;re a developer. Check the console!
             </p>
           </div>
           <form className="mt-8 space-y-6" onSubmit={formik.handleSubmit}>

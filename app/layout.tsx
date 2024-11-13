@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { poppinsFont, wixMadeforDisplayFont } from "@/lib/fonts";
 import ReactQueryProvider from "@/lib/query/queryProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,6 +20,7 @@ export default function RootLayout({
         className={`${wixMadeforDisplayFont.variable} ${poppinsFont.variable} antialiased  font-secondary`}
       >
         <ReactQueryProvider>{children}</ReactQueryProvider>
+        <Toaster />
       </body>
     </html>
   );
