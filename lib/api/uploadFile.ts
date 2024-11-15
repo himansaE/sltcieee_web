@@ -23,7 +23,6 @@ export const uploadFile = async ({
     },
   });
 
-  console.log(req.data);
   if (req.data.success !== true) {
     throw new Error("File upload failed");
   }
