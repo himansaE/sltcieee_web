@@ -30,7 +30,11 @@ export async function middleware(request: NextRequest) {
   } catch (error) {
     console.error("Middleware error:", error);
     const url = request.nextUrl.clone();
+    const callbackUrl = encodeURIComponent(
+      request.nextUrl.pathname + request.nextUrl.search
+    );
     url.pathname = "/login";
+    url.searchParams.set("callbackUrl", callbackUrl);
     return NextResponse.redirect(url);
   }
 }
