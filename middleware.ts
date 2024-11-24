@@ -6,7 +6,6 @@ import { validateAccess } from "@/lib/auth/middleware.helper";
 export async function middleware(request: NextRequest) {
   try {
     const path = request.nextUrl.pathname;
-    console.log("Middleware is running during build phase");
     const response = await fetch(`${request.nextUrl.origin}/api/auth/session`, {
       headers: {
         cookie: request.headers.get("cookie") || "",
