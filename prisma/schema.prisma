@@ -75,3 +75,28 @@ model Verification {
 
   @@map("verification")
 }
+
+
+model Event{
+  id          String   @id @map("_id") @default(cuid())
+  slug        String  @unique
+  title       String
+  description String
+  image       String
+  coverImage  String
+  createdAt   DateTime
+  organizationUnitId String
+  organizationUnit OrganizationUnit @relation(fields: [organizationUnitId], references: [id])
+  @@map("event")
+}
+
+model OrganizationUnit{
+  id          String   @id @map("_id") @default(cuid())
+  slug        String  @unique
+  title       String
+  description String
+  image       String
+  createdAt   DateTime
+  @@map("organizationUnit")
+  events Event[]
+}
