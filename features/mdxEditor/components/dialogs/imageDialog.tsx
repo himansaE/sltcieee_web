@@ -27,11 +27,13 @@ import { Label } from "@/components/ui/label";
 import { ImageIcon, Upload, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import Spinner from "@/components/ui/spinner";
 
 const validationSchema = Yup.object({
-  file: Yup.mixed(),
+  file: Yup.mixed().nullable(),
   src: Yup.string().when("file", {
     is: null,
+    // biome-ignore lint/suspicious/noThenProperty: <explanation>
     then: (schema) => schema.url("Must be a valid URL"),
     otherwise: (schema) => schema.optional(),
   }),
@@ -49,65 +51,82 @@ export function ImageDialog() {
     );
 
   const saveImage = usePublisher(saveImage$);
+
   const closeImageDialog = usePublisher(closeImageDialog$);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const formik = useFormik({
     initialValues: {
-      file: null as File | null,
+      file: null as unknown as File | null | undefined,
       src: state.type === "editing" ? state.initialValues?.src || "" : "",
       altText:
         state.type === "editing" ? state.initialValues?.altText || "" : "",
       title: state.type === "editing" ? state.initialValues?.title || "" : "",
     },
+
+    enableReinitialize: true,
     validationSchema,
     validateOnChange: false,
     validateOnBlur: true,
     onSubmit: async (values) => {
-      const toastId = toast.loading("Uploading image...");
-      try {
-        let imageUrl = values.src;
-        if (values.file) {
-          imageUrl = (await imageUploadHandler?.(values.file)) ?? "";
-        }
-
-        if (!imageUrl || !values.file) {
-          throw new Error("Please provide an image file or URL");
-        }
-
-        const fileList = new DataTransfer();
-        fileList.items.add(values.file);
-        saveImage({
-          src: imageUrl,
-          altText: values.altText,
-          title: values.title,
-          file: fileList as unknown as FileList,
-        });
-
-        toast.success("Image uploaded successfully", { id: toastId });
-        closeImageDialog();
-      } catch (error) {
-        console.error(error);
-        toast.error(
-          error instanceof Error ? error.message : "Failed to upload image",
-          {
-            id: toastId,
-          }
-        );
-        formik.setFieldError("file", "Failed to upload image");
+      if (!values.file && state.type === "new") {
+        formik.setFieldError("file", "Please provide an image file or URL");
+        return;
       }
+
+      if (state.type === "new" || (state.type === "editing" && values.file)) {
+        const toastId = toast.loading("Uploading image...");
+        try {
+          let imageUrl = values.src;
+          if (values.file) {
+            imageUrl = (await imageUploadHandler?.(values.file)) ?? "";
+          }
+
+          if (!imageUrl || !values.file) {
+            throw new Error("Please provide an image file or URL");
+          }
+
+          const fileList = new DataTransfer();
+          fileList.items.add(values.file);
+          saveImage({
+            src: imageUrl,
+            altText: values.altText,
+            title: values.title,
+            file: fileList as unknown as FileList,
+          });
+
+          toast.success("Image uploaded successfully", { id: toastId });
+        } catch (error) {
+          console.error(error);
+          toast.error(
+            error instanceof Error ? error.message : "Failed to upload image",
+            {
+              id: toastId,
+            }
+          );
+          formik.setFieldError("file", "Failed to upload image");
+        }
+      }
+      closeImageDialog();
     },
   });
 
   useEffect(() => {
+    // Handle file upload preview
     if (formik.values.file) {
       const objectUrl = URL.createObjectURL(formik.values.file);
       setPreviewUrl(objectUrl);
       return () => URL.revokeObjectURL(objectUrl);
-    } else {
-      setPreviewUrl(null);
     }
-  }, [formik.values.file]);
+
+    // Handle URL preview
+    if (formik.values.src) {
+      setPreviewUrl(formik.values.src);
+      return () => {};
+    }
+
+    setPreviewUrl(null);
+  }, [formik.values.file, formik.values.src]);
 
   return (
     <Dialog
@@ -128,6 +147,7 @@ export function ImageDialog() {
         </DialogHeader>
 
         <form onSubmit={formik.handleSubmit} className="space-y-4">
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
           <div
             className={cn(
               "relative flex flex-col items-center justify-center w-full h-52 border-2 border-dashed rounded-lg transition-colors",
@@ -144,6 +164,7 @@ export function ImageDialog() {
               <div className="relative w-full h-full">
                 <Image
                   src={previewUrl}
+                  unoptimized
                   alt="Preview"
                   fill
                   className="object-contain rounded-lg"
@@ -199,6 +220,7 @@ export function ImageDialog() {
             {imageAutocompleteSuggestions?.length > 0 && (
               <datalist id="image-suggestions">
                 {imageAutocompleteSuggestions.map((suggestion, index) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
                   <option key={index} value={suggestion} />
                 ))}
               </datalist>
@@ -248,11 +270,14 @@ export function ImageDialog() {
             >
               {formik.isSubmitting ? (
                 <>
-                  <Upload className="mr-2 h-4 w-4 animate-spin" />
+                  <Spinner className=" h-4 w-4 " />
                   Uploading...
                 </>
               ) : (
-                "Insert Image"
+                <>
+                  <Upload className="h-4 w-4" />
+                  Insert Image
+                </>
               )}
             </Button>
           </DialogFooter>

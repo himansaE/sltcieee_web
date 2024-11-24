@@ -6,7 +6,7 @@ import {
   type MDXEditorMethods,
   type MDXEditorProps,
 } from "@mdxeditor/editor";
-import { mdxPlugins } from "./lib/plugin";
+import { mdxPlugins } from "../lib/plugin";
 
 export default function InitializedMDXEditor({
   editorRef,
