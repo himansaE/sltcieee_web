@@ -1,13 +1,12 @@
 "use server";
 
 import { Role } from "@prisma/client";
-import type { ComponentType } from "react";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
 
-export async function WithAuth<P extends object>(
-  Component: ComponentType<P>,
+export async function WithAuth<P>(
+  Component: (props: P) => JSX.Element | Promise<JSX.Element>,
   allowedRoles: Role[]
 ) {
   return async function AuthenticatedComponent(props: P): Promise<JSX.Element> {
@@ -25,6 +24,6 @@ export async function WithAuth<P extends object>(
       redirect("/login");
     }
 
-    return <Component {...props} />;
+    return <>{await Component(props)}</>; // Ensure it renders correctly in a server context
   };
 }
