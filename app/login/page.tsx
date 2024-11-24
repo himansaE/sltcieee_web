@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useFormik } from "formik";
-
+import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
@@ -13,6 +13,8 @@ import { useState } from "react";
 
 export default function ModernAdminLogin() {
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams?.get("callbackUrl") || "/admin/dashboard";
 
   const formik = useFormik({
     initialValues: {
@@ -28,7 +30,7 @@ export default function ModernAdminLogin() {
           email: values.email,
           password: values.password,
           dontRememberMe: !values.rememberMe,
-          callbackURL: "/admin/dashboard",
+          callbackURL: decodeURIComponent(callbackUrl),
         });
 
         if (req.error) {
