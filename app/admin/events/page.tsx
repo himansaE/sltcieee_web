@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { AdminEventsPage } from "@/features/events/components/eventPage";
 import type { EventWithOrganization } from "@/lib/api/events.Fn";
 import prisma from "@/lib/prisma";
