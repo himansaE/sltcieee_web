@@ -58,6 +58,7 @@ const isValidFileExtension = (extension: string): boolean => {
 
 export const POST = async (req: NextRequest) => {
   const role = await checkAuth([Role.admin, Role.content]);
+
   if (!role) {
     return NextResponse.json(...authError);
   }

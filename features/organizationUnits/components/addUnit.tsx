@@ -31,6 +31,7 @@ export default function AddNewOrganizationUnit(props: { refresh: () => void }) {
       logo: null,
       title: "",
       description: "",
+      slug: "",
     },
     validationSchema: organizationUnitValidationSchema,
     onSubmit: async (values) => {
@@ -165,6 +166,18 @@ export default function AddNewOrganizationUnit(props: { refresh: () => void }) {
             placeholder="Enter event title"
             errorMessage={(formik.touched.title && formik.errors.title) || ""}
             disabled={isCreatingOrganizationUnit || isUploading}
+          />
+
+          <TextInput
+            id="slug"
+            name="slug"
+            label="URL Slug"
+            value={formik.values.slug}
+            onChange={formik.handleChange}
+            placeholder="organization-unit-url-slug"
+            errorMessage={(formik.touched.slug && formik.errors.slug) || ""}
+            disabled={isCreatingOrganizationUnit || isUploading}
+            instructionMessage="URL-friendly version of the title (lowercase letters, numbers, and hyphens only)"
           />
 
           <div>

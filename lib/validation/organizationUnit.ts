@@ -5,6 +5,12 @@ export const organizationUnitValidationSchema = Yup.object({
   description: Yup.string().required(
     "Organization unit description is required"
   ),
+  slug: Yup.string()
+    .required("Slug is required")
+    .matches(
+      /^[a-z0-9-]+$/,
+      "Slug can only contain lowercase letters, numbers and hyphens"
+    ),
   logo: Yup.mixed()
     .required("Organization unit logo is required")
     .test("fileSize", "File too large", (value) => {
@@ -21,4 +27,10 @@ export const organizationUnitReqValidationSchema =
   organizationUnitValidationSchema.shape({
     logo: Yup.mixed().notRequired(),
     image: Yup.string().required(),
+    slug: Yup.string()
+      .required("Slug is required")
+      .matches(
+        /^[a-z0-9-]+$/,
+        "Slug can only contain lowercase letters, numbers and hyphens"
+      ),
   });

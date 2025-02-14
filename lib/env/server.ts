@@ -22,4 +22,7 @@ export const ServerEnv = {
     BUCKET_NAME: getServerVariable("R2_BUCKET_NAME"),
     ENDPOINT: getServerVariable("R2_ENDPOINT"),
   },
+  AUTH: {
+    INTERNAL_TOKEN: getServerVariable("INTERNAL_AUTH_TOKEN"),
+  },
 } as const;
