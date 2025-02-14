@@ -92,7 +92,7 @@ model Event{
 
 model OrganizationUnit{
   id          String   @id @map("_id") @default(cuid())
-  slug        String  @unique
+  slug        String   @unique
   title       String
   description String
   image       String
