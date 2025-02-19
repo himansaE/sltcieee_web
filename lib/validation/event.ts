@@ -30,6 +30,15 @@ export const eventValidationSchema = Yup.object({
   title: Yup.string().required("Title is required"),
   organizationUnit: Yup.string().required("Organization unit is required"),
   description: Yup.string().required("Description is required"),
+  date: Yup.date()
+    .required("Event date is required")
+    .min(new Date(), "Event date cannot be in the past"),
+  eventType: Yup.string()
+    .oneOf(["PUBLIC", "INTER_UNIVERSITY", "SLTC_ONLY", "IEEE_MEMBERS"])
+    .required("Event type is required"),
+  location: Yup.string()
+    .required("Location is required")
+    .min(3, "Location must be at least 3 characters"),
 });
 
 // extend from eventValidationSchema

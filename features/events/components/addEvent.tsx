@@ -28,8 +28,15 @@ import { cn } from "@/lib/utils";
 import { uploadFile } from "@/lib/api/uploadFile";
 import { useState } from "react";
 import { eventValidationSchema } from "@/lib/validation/event";
+import { DatePicker } from "@/components/ui/date-picker";
+import { EventType } from "@prisma/client";
+import { eventTypeNames } from "@/lib/constant/event";
 
-export default function AddNewEvent() {
+type AddNewEventProps = {
+  refetchEvents: () => void;
+};
+
+export default function AddNewEvent(props: AddNewEventProps) {
   const [isOpened, setIsOpened] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
@@ -41,6 +48,9 @@ export default function AddNewEvent() {
       title: "",
       organizationUnit: "",
       description: "",
+      date: null as Date | null,
+      eventType: "PUBLIC",
+      location: "",
     },
     validationSchema: eventValidationSchema,
     onSubmit: async (values) => {
@@ -56,10 +66,12 @@ export default function AddNewEvent() {
           uploadFileMutation({
             buffer: values.logo,
             key: (values.logo as File)?.name ?? "",
+            path: "event/logo",
           }),
           uploadFileMutation({
             buffer: values.coverImage,
             key: (values.coverImage as File)?.name ?? "",
+            path: "event/cover",
           }),
         ]);
 
@@ -70,9 +82,13 @@ export default function AddNewEvent() {
           description: values.description,
           image: logoData.filename,
           coverImage: coverData.filename,
+          date: values.date!,
+          eventType: values.eventType as EventType,
+          location: values.location,
         });
 
         toast.success("Event has been created.", { id: msg });
+        props.refetchEvents();
 
         setIsOpened(false);
         formik.resetForm();
@@ -219,7 +235,7 @@ export default function AddNewEvent() {
                           src={logoUrl}
                           alt="Logo preview"
                           fill
-                          className="object-cover"
+                          className="object-contain"
                         />
                       </>
                     ) : (
@@ -287,6 +303,23 @@ export default function AddNewEvent() {
                   )}
               </div>
 
+              {/* Date Field */}
+              <div className="space-y-2">
+                <Label htmlFor="date">Event Date</Label>
+                <DatePicker
+                  date={formik.values.date || undefined}
+                  onSelect={(date) => formik.setFieldValue("date", date)}
+                  placeholder="Select event date"
+                  error={!!(formik.touched.date && formik.errors.date)}
+                  disabled={isLoading || isUploading}
+                />
+                {formik.touched.date && formik.errors.date && (
+                  <p className="text-sm text-red-500">
+                    {formik.errors.date as string}
+                  </p>
+                )}
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
@@ -298,6 +331,43 @@ export default function AddNewEvent() {
                 {formik.touched.description && formik.errors.description && (
                   <p className="text-sm text-red-500">
                     {formik.errors.description}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label>Event Type</Label>
+                <Select
+                  value={formik.values.eventType}
+                  onValueChange={(value) =>
+                    formik.setFieldValue("eventType", value)
+                  }
+                  disabled={isLoading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select event type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(EventType).map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {eventTypeNames[type]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="location">Location</Label>
+                <Input
+                  id="location"
+                  {...formik.getFieldProps("location")}
+                  disabled={isLoading || isUploading}
+                  placeholder="Online or Location"
+                />
+                {formik.touched.location && formik.errors.location && (
+                  <p className="text-sm text-red-500">
+                    {formik.errors.location}
                   </p>
                 )}
               </div>

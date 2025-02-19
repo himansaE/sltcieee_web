@@ -15,20 +15,22 @@ const s3Client = new S3Client({
   forcePathStyle: true,
 });
 
-export const uploadFile = async (file: Buffer, key: string) => {
-  try {
-    await s3Client.send(
-      new PutObjectCommand({
-        Bucket: ServerEnv.R2.BUCKET_NAME,
-        Key: key,
-        Body: file,
-        ACL: "public-read",
-      })
-    );
-  } catch (error) {
-    console.error("Error uploading file: ", error);
-    throw error;
+export const uploadFile = async (
+  buffer: Buffer,
+  key: string,
+  options?: {
+    ContentType?: string;
+    CacheControl?: string;
   }
+) => {
+  const command = new PutObjectCommand({
+    Bucket: ServerEnv.R2.BUCKET_NAME,
+    Key: key,
+    Body: buffer,
+    ...options,
+  });
+
+  return s3Client.send(command);
 };
 
 export const fileExists = async (key: string): Promise<boolean> => {

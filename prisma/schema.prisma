@@ -19,6 +19,25 @@ enum Role {
   content
 }
 
+enum EventStatus {
+  draft
+  comingSoon
+  dateAnnounced
+  registrationOpen
+  registrationClosed
+  ongoing
+  completed
+}
+
+enum EventType {
+  INTER_UNIVERSITY
+  SLTC_ONLY
+  IEEE_MEMBERS
+  PUBLIC
+}
+
+
+
 model User {
   id            String   @id @map("_id")
   name          String
@@ -78,16 +97,38 @@ model Verification {
 
 
 model Event{
+  id                String            @id @map("_id") @default(cuid())
+  slug              String            @unique
+  title             String
+  description       String
+  image             String
+  coverImage        String
+  createdAt         DateTime
+  date              DateTime
+  status            EventStatus       @default(draft)
+  organizationUnitId String
+  organizationUnit  OrganizationUnit  @relation(fields: [organizationUnitId], references: [id])
+  EventSession      EventSession[]
+
+  // New fields
+  eventType         EventType         @default(PUBLIC)
+  location          String            
+
+  @@map("event")
+}
+
+model EventSession{
   id          String   @id @map("_id") @default(cuid())
-  slug        String  @unique
   title       String
   description String
-  image       String
-  coverImage  String
+  data      DateTime
+
   createdAt   DateTime
-  organizationUnitId String
-  organizationUnit OrganizationUnit @relation(fields: [organizationUnitId], references: [id])
-  @@map("event")
+  eventId     String
+  event       Event @relation(fields: [eventId], references: [id])
+
+  @@map("EventSession")
+
 }
 
 model OrganizationUnit{
@@ -99,4 +140,13 @@ model OrganizationUnit{
   createdAt   DateTime
   @@map("organizationUnit")
   events Event[]
+}
+
+model Person{
+  id          String   @id @map("_id") @default(cuid())
+  name        String
+  image       String
+  createdAt   DateTime
+  linkedin     String
+  @@map("person")
 }

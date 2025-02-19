@@ -37,24 +37,24 @@ export const AdminSideNav: React.FC<AdminSideNavProps> = (props) => {
             <SidebarMenuItem>
               <SidebarMenuButton
                 size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-1 mt-2"
               >
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground shrink-0">
+                <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-transparent text-sidebar-primary-foreground shrink-0">
                   <Image
-                    src="/yp_logo.png"
-                    height={39}
-                    width={39}
+                    src="/sb-icon-color.webp"
+                    height={56}
+                    width={56}
                     className="rounded-lg"
                     quality={100}
                     alt="YP Logo"
                   />
                 </div>
-                <div className="flex flex-col flex-1 text-left text-sm leading-tight pl-4">
+                <div className="flex flex-col flex-1 text-left text-sm leading-tight text-primary-500 ">
                   <span className="truncate font-semibold whitespace-nowrap">
-                    YPSL
+                    SLTC
                   </span>
                   <span className="truncate text-xs whitespace-nowrap">
-                    Yearly NewsLetter
+                    IEEE Student Branch Chapter
                   </span>
                 </div>
               </SidebarMenuButton>
