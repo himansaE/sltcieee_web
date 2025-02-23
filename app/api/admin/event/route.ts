@@ -68,7 +68,6 @@ export async function POST(req: NextRequest) {
         title: data.title.trim(),
         description: data.description.trim(),
         image: data.image,
-        organizationUnitId: data.organizationUnit,
         coverImage: data.coverImage,
         slug,
         createdAt: new Date(),

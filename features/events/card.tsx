@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { eventTypeNames } from "@/lib/constant/event";
+import { eventStatusNames, eventTypeNames } from "@/lib/constant/event";
 import Link from "next/link";
 
 interface EventCardProps {
@@ -21,18 +21,16 @@ interface EventCardProps {
 
 export const EventCard = ({ event }: EventCardProps) => {
   const eventDate = new Date(event.date);
-  const isUpcoming = eventDate > new Date();
 
   return (
     <div className="group relative overflow-hidden rounded-xl bg-white border border-border transition-all duration-200 hover:shadow-lg hover:shadow-primary/5">
       {/* Status Indicator */}
-      {isUpcoming && (
-        <div className="absolute top-4 left-4 z-20">
-          <Badge variant="default" className="bg-primary/90 backdrop-blur-sm">
-            Upcoming
-          </Badge>
-        </div>
-      )}
+
+      <div className="absolute top-4 left-4 z-20">
+        <Badge variant="default" className="bg-primary/90 backdrop-blur-sm">
+          {eventStatusNames[event.status]}
+        </Badge>
+      </div>
 
       {/* Actions Menu */}
       <div className="absolute top-4 right-4 z-20">

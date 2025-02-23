@@ -109,10 +109,8 @@ model Event{
   organizationUnitId String
   organizationUnit  OrganizationUnit  @relation(fields: [organizationUnitId], references: [id])
   EventSession      EventSession[]
-
-  // New fields
   eventType         EventType         @default(PUBLIC)
-  location          String            
+  location          String     
 
   @@map("event")
 }

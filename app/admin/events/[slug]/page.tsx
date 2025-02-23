@@ -12,9 +12,6 @@ export default async function EventPage({ params }: EventPageProps) {
     where: { slug: params.slug },
     include: {
       organizationUnit: true,
-      EventSession: {
-        orderBy: {},
-      },
     },
   })) as EventWithDetails | null;
 
