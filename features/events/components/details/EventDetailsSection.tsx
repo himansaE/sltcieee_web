@@ -1,3 +1,4 @@
+"use client";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import { format } from "date-fns";
 import { EventStatus, EventType } from "@prisma/client";

@@ -25,4 +25,11 @@ export const ServerEnv = {
   AUTH: {
     INTERNAL_TOKEN: getServerVariable("INTERNAL_AUTH_TOKEN"),
   },
+  RESEND: {
+    API_KEY: getServerVariable("RESEND_API_KEY"),
+    FROM_EMAIL: getServerVariable("RESEND_FROM_EMAIL", {
+      required: false,
+      fallback: "",
+    }),
+  },
 } as const;

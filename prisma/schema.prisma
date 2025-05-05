@@ -110,7 +110,8 @@ model Event{
   organizationUnit  OrganizationUnit  @relation(fields: [organizationUnitId], references: [id])
   EventSession      EventSession[]
   eventType         EventType         @default(PUBLIC)
-  location          String     
+  location          String
+  galleryItems      EventGalleryItem[]
 
   @@map("event")
 }
@@ -147,4 +148,15 @@ model Person{
   createdAt   DateTime
   linkedin     String
   @@map("person")
+}
+
+model EventGalleryItem {
+  id        String   @id @map("_id") @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  imageUrl  String
+  caption   String?
+  createdAt DateTime @default(now())
+
+  @@map("eventGalleryItem")
 }

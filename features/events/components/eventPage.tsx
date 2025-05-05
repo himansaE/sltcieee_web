@@ -1,11 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { CalendarX2 } from "lucide-react";
 import AddNewEvent from "./addEvent";
 import type { EventWithOrganization, EventsFilter } from "@/lib/api/events.Fn";
 import { EventCard } from "../card";
 import { useEvents } from "@/hooks/useEvents";
-import { EventFilters } from "./eventFilters";
+import { EventFilters, EventFiltersRef } from "./eventFilters";
 import { EventsGridSkeleton } from "./eventSkeleton";
 import { Button } from "@/components/ui/button";
 import { Search, X } from "lucide-react";
@@ -16,6 +16,7 @@ export const AdminEventsPage: React.FC<{
   // totalEvents: number;
   itemsPerPage: number;
 }> = ({ itemsPerPage }) => {
+  const filtersRef = useRef<EventFiltersRef>(null);
   const [filters, setFilters] = useState<EventsFilter>({
     sortBy: "date",
     sortOrder: "desc",
@@ -48,12 +49,18 @@ export const AdminEventsPage: React.FC<{
   );
 
   const clearFilters = () => {
+    // Reset the filter state in this component
     setFilters({
       sortBy: "date",
       sortOrder: "desc",
       page: 1,
       itemsPerPage,
     });
+
+    // Reset the filter inputs in the child component
+    if (filtersRef.current) {
+      filtersRef.current.resetFilters();
+    }
   };
 
   // useEffect(() => {
@@ -63,15 +70,18 @@ export const AdminEventsPage: React.FC<{
 
   if (!events && !isLoading) return null;
 
-  console.log("isLoading", isLoading);
   return (
     <div className="px-5 py-4">
       <div className="flex justify-between items-center flex-row mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Manage Events</h1>
-        <AddNewEvent refetchEvents={refetchEvents} />
+        <AddNewEvent refetchEvents={refetchEvents} mode="create" />
       </div>
 
-      <EventFilters onFilterChange={setFilters} filtersList={filters} />
+      <EventFilters
+        ref={filtersRef}
+        onFilterChange={setFilters}
+        filtersList={filters}
+      />
 
       {isLoading ? (
         <EventsGridSkeleton />

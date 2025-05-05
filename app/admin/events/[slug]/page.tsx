@@ -1,19 +1,20 @@
-import { notFound } from "next/navigation";
-import prisma from "@/lib/prisma";
-import type { EventWithDetails } from "@/types/events";
 import { EventDetailsPage } from "@/features/events/components/eventDetailsPage";
+import prisma from "@/lib/prisma";
+import { notFound } from "next/navigation";
 
-interface EventPageProps {
+export default async function EventDetail({
+  params,
+}: {
   params: { slug: string };
-}
-
-export default async function EventPage({ params }: EventPageProps) {
-  const event = (await prisma.event.findUnique({
+}) {
+  const event = await prisma.event.findUnique({
     where: { slug: params.slug },
     include: {
       organizationUnit: true,
+      EventSession: true,
+      galleryItems: true,
     },
-  })) as EventWithDetails | null;
+  });
 
   if (!event) {
     notFound();
@@ -22,12 +23,24 @@ export default async function EventPage({ params }: EventPageProps) {
   return <EventDetailsPage event={event} />;
 }
 
-export async function generateMetadata({ params }: EventPageProps) {
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}) {
   const event = await prisma.event.findUnique({
     where: { slug: params.slug },
+    include: { organizationUnit: true },
   });
 
+  if (!event) {
+    return {
+      title: "Event Not Found",
+    };
+  }
+
   return {
-    title: `${event?.title || "Event"} | IEEE SLTC Admin`,
+    title: `${event.title} | IEEE SLTC Admin`,
+    description: event.description.substring(0, 160),
   };
 }

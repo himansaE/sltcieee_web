@@ -1,8 +1,14 @@
-import type { Event, EventSession, OrganizationUnit } from "@prisma/client";
+import type {
+  Event,
+  EventSession,
+  EventGalleryItem,
+  OrganizationUnit,
+} from "@prisma/client";
 
 export interface EventWithDetails extends Event {
   organizationUnit: OrganizationUnit;
   EventSession: EventSession[];
+  galleryItems: EventGalleryItem[];
 }
 
 export interface SessionFormData {

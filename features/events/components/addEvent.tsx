@@ -467,7 +467,11 @@ export default function AddNewEvent(props: AddNewEventProps) {
           >
             Cancel
           </Button>
-          <Button onClick={() => formik.handleSubmit()} disabled={isLoading}>
+          <Button
+            onClick={() => formik.handleSubmit()}
+            disabled={isLoading}
+            type="submit"
+          >
             {isLoading && <Spinner className="mr-2" />}
             {props.mode === "create" ? "Create Event" : "Save Changes"}
           </Button>
