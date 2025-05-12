@@ -15,6 +15,9 @@ const getServerVariable = (name: EnvVar, config: EnvConfig = {}): string => {
 };
 
 export const ServerEnv = {
+  APP: {
+    URL: getServerVariable("APP_URL"),
+  },
   R2: {
     ACCOUNT_ID: getServerVariable("R2_ACCOUNT_ID"),
     ACCESS_KEY_ID: getServerVariable("R2_ACCESS_KEY_ID"),

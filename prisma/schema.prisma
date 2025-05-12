@@ -36,7 +36,11 @@ enum EventType {
   PUBLIC
 }
 
-
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+}
 
 model User {
   id            String   @id @map("_id")
@@ -53,6 +57,7 @@ model User {
   banned     Boolean?
   banReason  String?
   banExpires Int?
+  invitations UserInvitation[] @relation("UserInvitations")
 
   @@unique([email])
   @@map("user")
@@ -95,8 +100,23 @@ model Verification {
   @@map("verification")
 }
 
+model UserInvitation {
+  id          String           @id @map("_id") @default(cuid())
+  email       String
+  token       String           @unique
+  createdAt   DateTime         @default(now())
+  expiresAt   DateTime
+  status      InvitationStatus @default(PENDING)
+  role        Role             @default(user)
+  userId      String?
+  user        User?            @relation("UserInvitations", fields: [userId], references: [id], onDelete: SetNull)
+  createdBy   String?
+  name        String?
 
-model Event{
+  @@map("userInvitation")
+}
+
+model Event {
   id                String            @id @map("_id") @default(cuid())
   slug              String            @unique
   title             String
@@ -116,21 +136,20 @@ model Event{
   @@map("event")
 }
 
-model EventSession{
+model EventSession {
   id          String   @id @map("_id") @default(cuid())
   title       String
   description String
-  data      DateTime
+  data        DateTime
 
   createdAt   DateTime
   eventId     String
   event       Event @relation(fields: [eventId], references: [id])
 
   @@map("EventSession")
-
 }
 
-model OrganizationUnit{
+model OrganizationUnit {
   id          String   @id @map("_id") @default(cuid())
   slug        String   @unique
   title       String
@@ -141,12 +160,12 @@ model OrganizationUnit{
   events Event[]
 }
 
-model Person{
+model Person {
   id          String   @id @map("_id") @default(cuid())
   name        String
   image       String
   createdAt   DateTime
-  linkedin     String
+  linkedin    String
   @@map("person")
 }
 

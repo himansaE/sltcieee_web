@@ -5,8 +5,7 @@ import { ServerEnv } from "@/lib/env/server";
 export const resend = new Resend(ServerEnv.RESEND.API_KEY);
 
 // Default from email address
-export const DEFAULT_FROM_EMAIL =
-  ServerEnv.RESEND.API_KEY || "noreply@sltc.ieee.org";
+export const DEFAULT_FROM_EMAIL = "IEEE SLTC <noreply@sltc.ieee.org>";
 
 /**
  * Send an email using Resend

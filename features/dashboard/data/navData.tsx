@@ -1,10 +1,10 @@
 import {
   BookOpen,
-  Settings2,
-  HomeIcon,
   Users,
   CalendarIcon,
   Building2,
+  HomeIcon,
+  PenToolIcon,
 } from "lucide-react";
 
 export const navLinks = [
@@ -17,6 +17,11 @@ export const navLinks = [
     title: "Articles",
     url: "/admin/articles",
     icon: BookOpen,
+  },
+  {
+    title: "Authors",
+    url: "/admin/authors",
+    icon: PenToolIcon,
   },
   {
     title: "Events",
@@ -32,10 +37,5 @@ export const navLinks = [
     title: "Users",
     url: "/admin/users",
     icon: Users,
-  },
-  {
-    title: "Settings",
-    url: "/admin/settings",
-    icon: Settings2,
   },
 ];

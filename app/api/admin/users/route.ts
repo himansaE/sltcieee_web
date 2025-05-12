@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Role, Prisma } from "@prisma/client";
 import prisma from "@/lib/prisma";
-import { checkAuth } from "@/lib/auth/server";
+import { checkAuth, auth } from "@/lib/auth/server";
 import { authError } from "@/lib/auth/error";
+import { createUserInvitation } from "@/lib/services/invitation";
 
 // GET: Get all users with pagination and filtering
 export async function GET(req: NextRequest) {
@@ -74,17 +75,18 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST: Create a new user (admin only)
+// POST: Create a new user and send invitation email
 export async function POST(req: NextRequest) {
   const role = await checkAuth([Role.admin]);
   if (!role) return NextResponse.json(...authError);
 
   try {
     const data = await req.json();
+    const { name, email, role: userRole = Role.user } = data;
 
     // Check if email already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email: data.email },
+      where: { email },
     });
 
     if (existingUser) {
@@ -94,33 +96,37 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // In a real implementation with BetterAuth, you would use their createUser function
-    // This is a simplified version for demonstration purposes
-    const user = await prisma.user.create({
-      data: {
-        id: crypto.randomUUID(),
-        name: data.name,
-        email: data.email,
-        emailVerified: false,
-        role: data.role || Role.user,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        emailVerified: true,
-      },
+    // Get current admin user's session for tracking who created the invitation
+    const adminSession = await auth.api.getSession({
+      headers: req.headers,
+    });
+    const createdBy = adminSession?.user?.id;
+
+    // Create invitation and send email
+    const invitation = await createUserInvitation({
+      email,
+      name,
+      role: userRole,
+      createdBy,
     });
 
-    return NextResponse.json(user, { status: 201 });
-  } catch (error) {
-    console.error("Error creating user:", error);
+    // Return success response
     return NextResponse.json(
-      { error: "Failed to create user" },
+      {
+        success: true,
+        message: "User invitation sent successfully",
+        invitation: {
+          id: invitation.id,
+          email: invitation.email,
+          expiresAt: invitation.expiresAt,
+        },
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Error creating user invitation:", error);
+    return NextResponse.json(
+      { error: "Failed to create user invitation" },
       { status: 500 }
     );
   }
