@@ -19,6 +19,29 @@ enum Role {
   content
 }
 
+enum EventStatus {
+  draft
+  comingSoon
+  dateAnnounced
+  registrationOpen
+  registrationClosed
+  ongoing
+  completed
+}
+
+enum EventType {
+  INTER_UNIVERSITY
+  SLTC_ONLY
+  IEEE_MEMBERS
+  PUBLIC
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+}
+
 model User {
   id            String   @id @map("_id")
   name          String
@@ -34,6 +57,7 @@ model User {
   banned     Boolean?
   banReason  String?
   banExpires Int?
+  invitations UserInvitation[] @relation("UserInvitations")
 
   @@unique([email])
   @@map("user")
@@ -76,21 +100,56 @@ model Verification {
   @@map("verification")
 }
 
+model UserInvitation {
+  id          String           @id @map("_id") @default(cuid())
+  email       String
+  token       String           @unique
+  createdAt   DateTime         @default(now())
+  expiresAt   DateTime
+  status      InvitationStatus @default(PENDING)
+  role        Role             @default(user)
+  userId      String?
+  user        User?            @relation("UserInvitations", fields: [userId], references: [id], onDelete: SetNull)
+  createdBy   String?
+  name        String?
 
-model Event{
-  id          String   @id @map("_id") @default(cuid())
-  slug        String  @unique
-  title       String
-  description String
-  image       String
-  coverImage  String
-  createdAt   DateTime
+  @@map("userInvitation")
+}
+
+model Event {
+  id                String            @id @map("_id") @default(cuid())
+  slug              String            @unique
+  title             String
+  description       String
+  image             String
+  coverImage        String
+  createdAt         DateTime
+  date              DateTime
+  status            EventStatus       @default(draft)
   organizationUnitId String
-  organizationUnit OrganizationUnit @relation(fields: [organizationUnitId], references: [id])
+  organizationUnit  OrganizationUnit  @relation(fields: [organizationUnitId], references: [id])
+  EventSession      EventSession[]
+  eventType         EventType         @default(PUBLIC)
+  location          String
+  galleryItems      EventGalleryItem[]
+
   @@map("event")
 }
 
-model OrganizationUnit{
+model EventSession {
+  id          String   @id @map("_id") @default(cuid())
+  title       String
+  description String
+  data        DateTime
+
+  createdAt   DateTime
+  eventId     String
+  event       Event @relation(fields: [eventId], references: [id])
+
+  @@map("EventSession")
+}
+
+model OrganizationUnit {
   id          String   @id @map("_id") @default(cuid())
   slug        String   @unique
   title       String
@@ -99,4 +158,24 @@ model OrganizationUnit{
   createdAt   DateTime
   @@map("organizationUnit")
   events Event[]
+}
+
+model Person {
+  id          String   @id @map("_id") @default(cuid())
+  name        String
+  image       String
+  createdAt   DateTime
+  linkedin    String
+  @@map("person")
+}
+
+model EventGalleryItem {
+  id        String   @id @map("_id") @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  imageUrl  String
+  caption   String?
+  createdAt DateTime @default(now())
+
+  @@map("eventGalleryItem")
 }

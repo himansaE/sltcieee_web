@@ -1,5 +1,5 @@
 import { checkAuth } from "@/lib/auth/server";
-import { Role } from "@prisma/client";
+import { Role, Prisma } from "@prisma/client";
 import { authError } from "@/lib/auth/error";
 import { NextResponse, type NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
@@ -68,11 +68,12 @@ export async function POST(req: NextRequest) {
         title: data.title.trim(),
         description: data.description.trim(),
         image: data.image,
-        organizationUnitId: data.organizationUnit,
         coverImage: data.coverImage,
         slug,
         createdAt: new Date(),
         organizationUnit: { connect: { id: data.organizationUnitId } },
+        date: data.date,
+        location: data.location,
       },
     });
 
@@ -86,24 +87,70 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
-  try {
-    const events = await prisma.event.findMany({
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        image: true,
-        organizationUnitId: true,
-        slug: true,
-        createdAt: true,
-        organizationUnit: true,
-      },
-    });
+export async function GET(req: Request) {
+  const role = await checkAuth([Role.admin]);
+  if (!role) return NextResponse.json(...authError);
 
-    return NextResponse.json(events);
+  try {
+    const { searchParams } = new URL(req.url);
+    const withOrganization = searchParams.get("withOrganization") === "true";
+    const search = searchParams.get("search") || undefined;
+    const organizationUnitId =
+      searchParams.get("organizationUnitId") || undefined;
+    const sortBy = (searchParams.get("sortBy") || "date") as "date" | "title";
+    const sortOrder = (searchParams.get("sortOrder") || "desc") as
+      | "asc"
+      | "desc";
+
+    // Fix pagination params parsing
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
+    const itemsPerPage = Math.max(
+      1,
+      Math.min(50, parseInt(searchParams.get("itemsPerPage") || "12"))
+    );
+    const skip = (page - 1) * itemsPerPage;
+
+    // Build where clause
+    const where: Prisma.EventWhereInput = {
+      AND: [
+        organizationUnitId ? { organizationUnitId } : {},
+        search
+          ? {
+              OR: [
+                { title: { contains: search, mode: "insensitive" } },
+                { description: { contains: search, mode: "insensitive" } },
+              ],
+            }
+          : {},
+      ],
+    };
+
+    const [events, total] = await Promise.all([
+      prisma.event.findMany({
+        where,
+        include: {
+          organizationUnit: withOrganization,
+        },
+        orderBy: {
+          [sortBy]: sortOrder,
+        },
+        skip,
+        take: itemsPerPage,
+      }),
+      prisma.event.count({ where }),
+    ]);
+
+    console.log("Pagination:", { page, itemsPerPage, skip, total }); // Debug log
+
+    return NextResponse.json({
+      data: events,
+      total,
+      page,
+      itemsPerPage,
+      pageCount: Math.ceil(total / itemsPerPage),
+    });
   } catch (error) {
-    console.error("Event fetch error:", error);
+    console.error("Error fetching events:", error);
     return NextResponse.json(
       { error: "Failed to fetch events" },
       { status: 500 }

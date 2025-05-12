@@ -11,7 +11,6 @@ import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
 import { useState, Suspense } from "react";
 
-// Separate the form into its own component
 function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams?.get("callbackUrl") || "/admin/dashboard";
@@ -51,13 +50,13 @@ function LoginForm() {
   });
 
   return (
-    <div className="w-full max-w-md space-y-8">
+    <div className="w-full space-y-6">
       <div className="text-center">
-        <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+        <h2 className="text-2xl lg:text-3xl font-extrabold text-gray-900">
           Welcome Back, Admin
         </h2>
         <p className="mt-2 text-sm text-gray-600">
-          Log in to manage the newsletter
+          Log in to manage the content
         </p>
       </div>
       <form className="mt-8 space-y-6" onSubmit={formik.handleSubmit}>
@@ -124,7 +123,7 @@ function LoginForm() {
           <div className="text-sm">
             <Link
               href="/forget-password"
-              className="font-medium text-blue-600 hover:text-blue-500 hover:underline"
+              className="font-medium text-sky-600 hover:text-sky-700 hover:underline"
             >
               Forgot your password?
             </Link>
@@ -134,7 +133,7 @@ function LoginForm() {
         <div>
           <Button
             type="submit"
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
             disabled={formik.isSubmitting}
             loading={formik.isSubmitting}
           >
@@ -149,27 +148,44 @@ function LoginForm() {
 // Main page component
 export default function ModernAdminLogin() {
   return (
-    <div className="flex h-screen">
-      <div className="hidden lg:flex lg:w-1/2 flex-col gap-5 bg-gradient-to-br from-blue-500 via-green-400 to-orange-500 items-center justify-center p-12">
-        <div>
+    <div className="flex min-h-screen bg-white">
+      <div className="hidden lg:flex lg:w-1/2 max-w-2xl flex-col gap-5 bg-gradient-to-br from-sky-700 via-sky-600 to-blue-900 relative items-center justify-center overflow-hidden">
+        <div className="relative bg-white/95 rounded-2xl  transform  transition-all duration-300 ">
           <Image
-            src="/yp_logo.png"
+            src="/sb-icon-color.webp"
             alt="Newsletter Logo"
-            width={200}
-            height={200}
+            width={160}
+            height={160}
             priority
-            className="max-w-sm rounded-xl mt-5"
+            className="max-w-sm rounded-lg"
+            unoptimized
           />
         </div>
-        <div className="font-secondary text-white text-2xl font-semibold text-center rounded-lg bg-black bg-opacity-30 py-1 px-4">
-          IEEE Young Professionals Sri Lanka
+        <div className="relative font-secondary text-white text-2xl font-semibold text-center rounded-lg bg-black/0 backdrop-blur-md py-3 px-8 ">
+          IEEE Student Branch Chapter of SLTC
         </div>
       </div>
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <Suspense fallback={<div />}>
-          <LoginForm />
-        </Suspense>
+      {/* Right side with mobile logo */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8">
+        {/* Mobile-only logo */}
+        <div className="lg:hidden flex flex-col items-center mb-8">
+          <Image
+            src="/sb-icon-color.webp"
+            alt="Newsletter Logo"
+            width={100}
+            height={100}
+            priority
+            unoptimized
+            className="bg-white rounded-full overflow-hidden"
+          />
+        </div>
+
+        <div className="w-full max-w-md">
+          <Suspense fallback={<div />}>
+            <LoginForm />
+          </Suspense>
+        </div>
       </div>
     </div>
   );

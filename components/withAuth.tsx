@@ -4,12 +4,13 @@ import { Role } from "@prisma/client";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
+import { ComponentType, ReactElement } from "react";
 
-export async function WithAuth<P>(
-  Component: (props: P) => JSX.Element | Promise<JSX.Element>,
+export async function WithAuth<P extends object = Record<string, unknown>>(
+  Component: ComponentType<P>,
   allowedRoles: Role[]
 ) {
-  return async function AuthenticatedComponent(props: P): Promise<JSX.Element> {
+  async function checkAuth() {
     const session = await auth.api.getSession({ headers: headers() });
 
     if (!session) {
@@ -24,6 +25,16 @@ export async function WithAuth<P>(
       redirect("/login");
     }
 
-    return <>{await Component(props)}</>; // Ensure it renders correctly in a server context
-  };
+    return session;
+  }
+
+  async function AuthenticatedComponent(props: P): Promise<ReactElement> {
+    await checkAuth();
+
+    return <Component {...props} />;
+  }
+
+  AuthenticatedComponent.displayName = `WithAuth(${Component.displayName || Component.name || "Component"})`;
+
+  return AuthenticatedComponent;
 }

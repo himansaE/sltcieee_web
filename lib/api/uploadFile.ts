@@ -3,12 +3,15 @@ import Request from "../http";
 export const uploadFile = async ({
   buffer,
   key,
+  path = "images/",
 }: {
   buffer: Blob;
   key: string;
+  path?: string;
 }) => {
   const formData = new FormData();
   formData.append("file", buffer, key);
+  formData.append("path", path);
 
   const req = await Request<{
     filename: string;

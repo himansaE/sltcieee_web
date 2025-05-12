@@ -23,7 +23,15 @@ import { toast } from "sonner";
 import { organizationUnitValidationSchema } from "@/lib/validation/organizationUnit";
 import { createOrganizationUnit } from "@/lib/api/organizationUnitFn";
 
-export default function AddNewOrganizationUnit(props: { refresh: () => void }) {
+interface AddNewOrganizationUnitProps {
+  refresh: () => void;
+  className?: string;
+}
+
+export default function AddNewOrganizationUnit({
+  refresh,
+  className,
+}: AddNewOrganizationUnitProps) {
   const [isOpened, setIsOpened] = useState(false);
 
   const formik = useFormik({
@@ -96,7 +104,7 @@ export default function AddNewOrganizationUnit(props: { refresh: () => void }) {
   } = useMutation({
     mutationFn: createOrganizationUnit,
     onSuccess: () => {
-      props.refresh();
+      refresh();
       formik.resetForm();
       setLogoUrl(null);
       setIsOpened(false);
@@ -106,12 +114,12 @@ export default function AddNewOrganizationUnit(props: { refresh: () => void }) {
   return (
     <Dialog open={isOpened} onOpenChange={setIsOpened}>
       <Button
-        onClick={() => {
-          setIsOpened(true);
-        }}
+        onClick={() => setIsOpened(true)}
+        size="sm"
+        className={cn("text-xs sm:text-sm", className)}
       >
-        <PlusCircle className="mr-2 h-4 w-4" />
-        Add New Unit
+        <PlusCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-2" />
+        <span className="hidden sm:inline">Add New Unit</span>
       </Button>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

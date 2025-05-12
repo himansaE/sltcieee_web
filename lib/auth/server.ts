@@ -1,15 +1,62 @@
-import { betterAuth } from "better-auth";
+import { betterAuth, User } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import prisma from "../prisma";
 import { admin } from "better-auth/plugins";
 import { headers } from "next/headers";
 import type { Role } from "@prisma/client";
+import { sendEmail } from "@/lib/services/resend";
+import {
+  generateResetPasswordEmailHTML,
+  generateLoginLinkEmailHTML,
+} from "@/lib/emails/templates";
 
 export const auth = betterAuth({
   appName: "YPSL NewsLetter",
   emailAndPassword: {
     enabled: true,
     autoSignIn: false,
+    autoCreate: true,
+    sendResetPassword: async (user: User, url) => {
+      try {
+        // Generate the password reset email using our React template
+        const emailHtml = generateResetPasswordEmailHTML(
+          user.name || "User",
+          url
+        );
+
+        // Send the email using Resend
+        await sendEmail({
+          to: user.email,
+          subject: "Reset Your SLTC IEEE Admin Password",
+          html: await emailHtml,
+        });
+
+        console.log(`Password reset email sent to ${user.email}`);
+        return Promise.resolve();
+      } catch (error) {
+        console.error("Failed to send password reset email:", error);
+        return Promise.reject(new Error("Failed to send password reset email"));
+      }
+    },
+    sendLoginLink: async (user: User, url: string) => {
+      try {
+        // Generate the login link email using our React template
+        const emailHtml = generateLoginLinkEmailHTML(user.name || "User", url);
+
+        // Send the email using Resend
+        await sendEmail({
+          to: user.email,
+          subject: "Your SLTC IEEE Admin Portal Access",
+          html: await emailHtml,
+        });
+
+        console.log(`Login link email sent to ${user.email}`);
+        return Promise.resolve();
+      } catch (error) {
+        console.error("Failed to send login link email:", error);
+        return Promise.reject(new Error("Failed to send login link email"));
+      }
+    },
   },
   database: prismaAdapter(prisma, {
     provider: "mongodb",
