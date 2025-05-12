@@ -11,7 +11,6 @@ import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
 import { useState, Suspense } from "react";
 
-// Separate the form into its own component
 function LoginForm() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams?.get("callbackUrl") || "/admin/dashboard";
