@@ -117,7 +117,7 @@ function IDCardModel({
     linearDamping: 2,
   };
 
-  const { size, camera } = useThree();
+  const { size } = useThree();
   const gl = useThree((state) => state.gl);
 
   const [curve] = useState(
