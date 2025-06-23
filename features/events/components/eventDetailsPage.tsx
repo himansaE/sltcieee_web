@@ -94,6 +94,7 @@ export function EventDetailsPage({
               eventType={event.eventType}
               status={event.status}
               eventId={event.id}
+              simpleDescription={event.simpleDescription}
             />
           </div>
 

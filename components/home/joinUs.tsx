@@ -7,7 +7,10 @@ const IDCard3DScene = dynamic(() => import("./idCard3D"), { ssr: false });
 
 export default function JoinUs() {
   return (
-    <section className="relative h-screen overflow-hidden bg-black text-white">
+    <section
+      id="join"
+      className="relative h-screen overflow-hidden bg-black text-white"
+    >
       {/* Background 3D ID Card - Full width */}
       <div className="absolute inset-0 z-0">
         <IDCard3DScene />
@@ -27,12 +30,31 @@ export default function JoinUs() {
             technologies, collaborate with peers, and build your career.
           </p>
           <div className="flex gap-4">
-            {/* Updated button style to match the image */}
+            {" "}
+            {/* Updated button style to match the contact us button */}
             <button
-              className="rounded-full bg-slate-100 px-8 py-3 font-semibold text-black hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-opacity-75 pointer-events-auto touch-auto "
+              className="group relative bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-3 px-8 rounded-full text-base transition-all duration-300 shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/50 transform hover:scale-105 border border-cyan-400/20 hover:border-cyan-300/30 pointer-events-auto touch-auto"
               style={{ pointerEvents: "auto" }}
             >
-              Join Now!
+              {" "}
+              <span className="relative z-10 flex items-center gap-1.5">
+                Join Now!
+                <svg
+                  className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </span>
+              {/* Button glow effect */}
+              <div className="absolute inset-0 rounded-full bg-cyan-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl"></div>
             </button>
           </div>
         </div>

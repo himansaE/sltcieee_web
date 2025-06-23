@@ -9,6 +9,7 @@ export interface EventWithDetails extends Event {
   organizationUnit: OrganizationUnit;
   EventSession: EventSession[];
   galleryItems: EventGalleryItem[];
+  simpleDescription?: string | null;
 }
 
 export interface SessionFormData {
@@ -18,3 +19,7 @@ export interface SessionFormData {
   image: File | null;
   speakers?: string[];
 }
+
+export type PublicEvent = Event & {
+  simpleDescription?: string | null;
+};

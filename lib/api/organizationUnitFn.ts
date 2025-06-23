@@ -1,4 +1,4 @@
-import type { OrganizationUnit, Prisma } from "@prisma/client";
+import type { OrganizationUnit, Prisma, Event } from "@prisma/client";
 import Request from "@lib/http";
 
 type OrganizationUnitCreateRequest = Omit<
@@ -18,9 +18,14 @@ export const createOrganizationUnit = async (
   return res.data;
 };
 
-export type OrganizationUnitWithEvents = Prisma.OrganizationUnitGetPayload<{
-  include: { events: true };
-}>;
+export type OrganizationUnitWithEvents = Omit<
+  Prisma.OrganizationUnitGetPayload<{
+    include: { events: true };
+  }>,
+  "events"
+> & {
+  events: (Event & { simpleDescription?: string | null })[];
+};
 
 export type OrganizationUnitReturn<T extends boolean> = T extends true
   ? OrganizationUnitWithEvents[]

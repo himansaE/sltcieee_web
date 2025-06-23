@@ -23,6 +23,7 @@ interface EventDetailsSectionProps {
   eventType: EventType;
   status: EventStatus;
   eventId: string;
+  simpleDescription?: string | null;
 }
 
 export function EventDetailsSection({
@@ -31,6 +32,7 @@ export function EventDetailsSection({
   eventType,
   status,
   eventId,
+  simpleDescription,
 }: EventDetailsSectionProps) {
   const queryClient = useQueryClient();
   const [newStatus, setNewStatus] = useState(status);
@@ -88,6 +90,18 @@ export function EventDetailsSection({
             <p className="text-muted-foreground">{eventTypeNames[eventType]}</p>
           </div>
         </div>
+
+        {simpleDescription && (
+          <div className="flex items-start gap-3 text-sm">
+            <Users className="h-5 w-5 text-primary flex-shrink-0" />
+            <div>
+              <p className="font-medium">Short Description</p>
+              <p className="text-muted-foreground break-words">
+                {simpleDescription}
+              </p>
+            </div>
+          </div>
+        )}
 
         <Separator />
 

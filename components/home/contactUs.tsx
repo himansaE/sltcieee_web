@@ -39,9 +39,11 @@ const ContactUs = () => {
       name: "Alex Brown",
     },
   ];
-
   return (
-    <section className="relative min-h-screen bg-[#111] text-white overflow-hidden">
+    <section
+      id="contact"
+      className="relative min-h-screen bg-[#111] text-white overflow-hidden"
+    >
       {/* Background Pattern */}
       <div className="absolute inset-0 z-0">
         <div className="absolute left-0 top-0 transform -translate-x-1/3 opacity-100 size-full inset-0">
@@ -70,7 +72,7 @@ const ContactUs = () => {
               </h1>
 
               <p className="text-[#434343] text-lg md:text-xl font-medium">
-                Let&apos;s make an impact
+                make an impact
               </p>
             </div>
           </div>{" "}

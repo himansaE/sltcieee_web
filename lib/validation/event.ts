@@ -30,6 +30,7 @@ export const eventValidationSchema = Yup.object({
   title: Yup.string().required("Title is required"),
   organizationUnit: Yup.string().required("Organization unit is required"),
   description: Yup.string().required("Description is required"),
+  simpleDescription: Yup.string().nullable(),
   date: Yup.date()
     .required("Event date is required")
     .min(new Date(), "Event date cannot be in the past"),

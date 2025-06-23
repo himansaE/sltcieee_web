@@ -1,9 +1,15 @@
-import type { Event, EventStatus, EventType, Prisma } from "@prisma/client";
+import type {
+  Event,
+  EventStatus,
+  EventType,
+  OrganizationUnit,
+} from "@prisma/client";
 import Request from "@lib/http";
 
 export interface EventCreateRequest {
   title: string;
   description: string;
+  simpleDescription?: string | null;
   image: string;
   coverImage: string;
   date: Date;
@@ -19,6 +25,15 @@ export type EventsReturn<T extends boolean> = PaginatedResponse<
 export type EventReturn<T extends boolean> = T extends true
   ? EventWithOrganization
   : Event;
+
+export type EventWithOrganization = Event & {
+  organizationUnit: OrganizationUnit;
+  simpleDescription?: string | null;
+};
+
+export type EventWithDetails = Event & {
+  organizationUnit: OrganizationUnit;
+};
 
 export const createEvent = async (event: EventCreateRequest) => {
   const res = await Request<Event>({
@@ -42,10 +57,6 @@ export const getEvent = async <T extends boolean>(
 
   return res.data;
 };
-
-export type EventWithOrganization = Prisma.EventGetPayload<{
-  include: { organizationUnit: true };
-}>;
 
 export interface PaginatedResponse<T> {
   data: T;

@@ -169,7 +169,7 @@ const OrganizationUnits: FC = () => {
       .filter((line): line is Line => line !== null);
 
     setLines(newLinesData);
-  }, [surroundingLogosData]); // Dependency on surroundingLogosData (though it's a const here)
+  }, []); // No dependencies needed since surroundingLogosData is a constant
 
   useEffect(() => {
     const timerId = setTimeout(calculateLines, 150);
@@ -233,9 +233,11 @@ const OrganizationUnits: FC = () => {
   const goToUnit = (index: number) => {
     setSelectedUnit(index);
   };
-
   return (
-    <section className="relative bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-950 via-black to-black text-white py-16 md:py-24 overflow-hidden">
+    <section
+      id="organization-units"
+      className="relative bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-950 via-black to-black text-white py-16 md:py-24 overflow-hidden"
+    >
       <div className="mx-auto grid md:grid-cols-2 gap-x-12 gap-y-16 items-center">
         {" "}
         {/* Left Text Content */}
@@ -314,10 +316,31 @@ const OrganizationUnits: FC = () => {
           </div>{" "}
           <Button
             className={cn(
-              "bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3.5 px-8 rounded-full text-lg transition-all duration-300 shadow-lg shadow-pink-500/40 hover:shadow-xl hover:shadow-pink-500/60 transform hover:scale-105"
+              "group relative bg-cyan-500 hover:bg-cyan-600",
+              "text-white font-semibold py-3.5 px-8 rounded-full text-lg",
+              "transition-all duration-300 shadow-lg shadow-cyan-500/30",
+              "hover:shadow-xl hover:shadow-cyan-500/50 transform hover:scale-105",
+              "border border-cyan-400/20 hover:border-cyan-300/30"
             )}
           >
-            Join Now!
+            <span className="relative z-10 flex items-center gap-1.5">
+              Join Now!
+              <svg
+                className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </span>
+            {/* Button glow effect */}
+            <div className="absolute inset-0 rounded-full bg-cyan-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl"></div>
           </Button>
         </div>
         {/* Right Graphical Content */}

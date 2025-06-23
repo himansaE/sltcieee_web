@@ -152,6 +152,7 @@ export default function AddNewEvent(props: AddNewEventProps) {
     initialValues: {
       title: props.event?.title ?? "",
       description: props.event?.description ?? "",
+      simpleDescription: props.event?.simpleDescription ?? "",
       date: props.event?.date ? new Date(props.event.date) : null,
       organizationUnit: props.event?.organizationUnitId ?? "",
       eventType: props.event?.eventType ?? "PUBLIC",
@@ -378,6 +379,22 @@ export default function AddNewEvent(props: AddNewEventProps) {
                   formik.errors.organizationUnit && (
                     <p className="text-sm text-red-500">
                       {formik.errors.organizationUnit}
+                    </p>
+                  )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="simpleDescription">Simple Description</Label>
+                <Textarea
+                  id="simpleDescription"
+                  placeholder="A short description for event cards. This will be shown in the public event grid."
+                  {...formik.getFieldProps("simpleDescription")}
+                  disabled={isLoading || isUploading}
+                />
+                {formik.touched.simpleDescription &&
+                  formik.errors.simpleDescription && (
+                    <p className="text-sm text-red-500">
+                      {formik.errors.simpleDescription as string}
                     </p>
                   )}
               </div>

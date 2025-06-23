@@ -63,7 +63,7 @@ const BentoCard: React.FC<BentoCardProps> = ({ title, content, className }) => {
 
 export const AboutUsBento: React.FC = () => {
   return (
-    <section className="py-20 sm:py-28 bg-[#0D0D0D]">
+    <section id="about" className="py-20 sm:py-28 bg-[#0D0D0D]">
       {" "}
       {/* Increased padding */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -64,13 +64,17 @@ const StatsSection: React.FC = () => {
       label: "Years",
       width: "140px",
     },
-    { value: 150, suffix: "+", label: "Volunteers ", width: "160px" },
+    {
+      value: 1,
+      suffix: "k+",
+      label: "Volunteers ",
+      width: "160px",
+    },
     { value: 120, suffix: "+", label: "Projects", width: "100px" },
     { value: 12, suffix: "+", label: "Awards", width: "140px" },
   ];
-
   return (
-    <section className="bg-black text-white py-14 md:py-24">
+    <section id="stats" className="bg-black text-white py-14 md:py-24">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-2 gap-y-12 md:grid-cols-4 relative">
           {stats.map((stat, index) => (
