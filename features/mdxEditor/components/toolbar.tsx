@@ -55,4 +55,36 @@ export function Toolbar() {
   );
 }
 
+export const SimpleMdxEditorToolbar = () => {
+  return (
+    <>
+      {/* Base controls */}
+      <div className="flex">
+        <UndoRedo />
+        <Separator />
+      </div>
+
+      {/* Formatting controls */}
+      <div className="flex">
+        <BoldItalicUnderlineToggles />
+        <Separator />
+        <BlockTypeSelect />
+      </div>
+
+      <div className="flex">
+        <ListsToggle />
+        <Separator />
+      </div>
+
+      {/* Insert tools */}
+      <div className="flex">
+        <CreateLink />
+
+        <InsertThematicBreak />
+        <Separator />
+      </div>
+    </>
+  );
+};
+
 export { Toolbar as MdxEditorToolbar };

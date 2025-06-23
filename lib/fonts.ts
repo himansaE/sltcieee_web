@@ -7,7 +7,7 @@ export const wixMadeforDisplayFont = Wix_Madefor_Display({
 });
 
 export const poppinsFont = Poppins({
-  weight: ["300", "400", "600"],
+  weight: ["300", "400", "600", "700", "800", "900"],
   variable: "--font-poppins",
   subsets: ["latin"],
 });

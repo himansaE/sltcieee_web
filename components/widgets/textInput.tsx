@@ -17,6 +17,8 @@ export interface Props {
   inputProps?: InputProps;
   textAreaProps?: TextareaProps;
   disabled?: boolean;
+  error?: string | undefined; // Add new error prop
+
   onChange?: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
@@ -35,6 +37,7 @@ export const TextInput: React.FC<Props> = ({
   inputProps,
   placeholder,
   errorMessage,
+  error, // Add error prop
   defaultValue,
   textAreaProps,
   multiline = false,
@@ -42,9 +45,11 @@ export const TextInput: React.FC<Props> = ({
   containerClassName,
   disabled,
 }) => {
+  const finalErrorMessage = error || errorMessage; // Combine both error sources
+
   const textInputClassName = cn("bg-white", {
     "focus-visible:ring-0 border-status-red border focus:border-status-red":
-      errorMessage,
+      finalErrorMessage,
   });
   const messageClassName = cn("text-xs text-dark-300 font-secondary");
 
@@ -85,10 +90,12 @@ export const TextInput: React.FC<Props> = ({
       ) : (
         <Input {...inputMergedProps} disabled={disabled} />
       )}
-      {errorMessage && (
-        <p className={cn(messageClassName, "text-red-600")}>{errorMessage}</p>
+      {finalErrorMessage && (
+        <p className={cn(messageClassName, "text-red-600")}>
+          {finalErrorMessage}
+        </p>
       )}
-      {!errorMessage?.trim() && instructionMessage && (
+      {!finalErrorMessage?.trim() && instructionMessage && (
         <p className={cn(messageClassName)}>{instructionMessage}</p>
       )}
     </div>

@@ -30,19 +30,16 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Generate and check slug
-    let slug = data.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-
     // Check for duplicate slug
     const existingUnit = await prisma.organizationUnit.findFirst({
-      where: { slug },
+      where: { slug: data.slug },
     });
 
     if (existingUnit) {
-      slug = `${slug}-${createId().slice(0, 8)}`;
+      return NextResponse.json(
+        { error: "An organization unit with this slug already exists" },
+        { status: 400 }
+      );
     }
 
     const organizationUnit = await prisma.organizationUnit.create({
@@ -51,7 +48,7 @@ export async function POST(req: NextRequest) {
         title: data.title.trim(),
         description: data.description.trim(),
         image: data.image,
-        slug,
+        slug: data.slug.trim(),
         createdAt: new Date(),
       },
     });
