@@ -10,11 +10,15 @@ export const validateAccess = async (
   session: any,
   allowedRoles: Role[]
 ) => {
+  const isApi = request.nextUrl.pathname.startsWith("/api/");
+
   if (!session?.user) {
+    if (isApi) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
   if (!allowedRoles.includes(session.user.role as Role)) {
+    if (isApi) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     return NextResponse.redirect(new URL("/need-access", request.url));
   }
 

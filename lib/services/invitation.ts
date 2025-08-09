@@ -1,7 +1,7 @@
 import { InvitationStatus, Role } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { randomBytes } from "crypto";
-import { sendEmail } from "@/lib/services/resend";
+import { sendEmail } from "@/lib/services/mailer";
 import { generateLoginLinkEmailHTML } from "@/lib/emails/templates";
 import { ServerEnv } from "../env/server";
 

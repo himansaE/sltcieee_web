@@ -28,11 +28,10 @@ export const ServerEnv = {
   AUTH: {
     INTERNAL_TOKEN: getServerVariable("INTERNAL_AUTH_TOKEN"),
   },
-  RESEND: {
-    API_KEY: getServerVariable("RESEND_API_KEY"),
-    FROM_EMAIL: getServerVariable("RESEND_FROM_EMAIL", {
-      required: false,
-      fallback: "",
-    }),
+  GMAIL: {
+    USER: getServerVariable("GMAIL_USER"),
+    CLIENT_ID: getServerVariable("GMAIL_CLIENT_ID"),
+    CLIENT_SECRET: getServerVariable("GMAIL_CLIENT_SECRET"),
+    REFRESH_TOKEN: getServerVariable("GMAIL_REFRESH_TOKEN"),
   },
 } as const;

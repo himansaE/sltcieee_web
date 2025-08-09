@@ -6,6 +6,8 @@ import { validateAccess } from "@/lib/auth/middleware.helper";
 export async function middleware(request: NextRequest) {
   try {
     const path = request.nextUrl.pathname;
+    const isApi = path.startsWith("/api/");
+
     const response = await fetch(`${request.nextUrl.origin}/api/auth/session`, {
       headers: {
         cookie: request.headers.get("cookie") || "",
@@ -16,7 +18,16 @@ export async function middleware(request: NextRequest) {
     const session = response.ok ? await response.json() : null;
 
     if (!session) {
-      throw new Error("No session found");
+      if (isApi) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      const url = request.nextUrl.clone();
+      const callbackUrl = encodeURIComponent(
+        request.nextUrl.pathname + request.nextUrl.search
+      );
+      url.pathname = "/login";
+      url.searchParams.set("callbackUrl", callbackUrl);
+      return NextResponse.redirect(url);
     }
 
     const allowedRoles = getRouteRoles(path);
@@ -28,6 +39,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   } catch (error) {
     console.error("Middleware error:", error);
+    const path = request.nextUrl.pathname;
+    const isApi = path.startsWith("/api/");
+
+    if (isApi) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const url = request.nextUrl.clone();
     const callbackUrl = encodeURIComponent(
       request.nextUrl.pathname + request.nextUrl.search
@@ -39,5 +57,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/api/admin/:path*"],
 };

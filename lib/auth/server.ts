@@ -4,7 +4,7 @@ import prisma from "../prisma";
 import { admin } from "better-auth/plugins";
 import { headers } from "next/headers";
 import type { Role } from "@prisma/client";
-import { sendEmail } from "@/lib/services/resend";
+import { sendEmail } from "@/lib/services/mailer";
 import {
   generateResetPasswordEmailHTML,
   generateLoginLinkEmailHTML,
@@ -24,7 +24,7 @@ export const auth = betterAuth({
           url
         );
 
-        // Send the email using Resend
+        // Send the email
         await sendEmail({
           to: user.email,
           subject: "Reset Your SLTC IEEE Admin Password",
@@ -43,7 +43,7 @@ export const auth = betterAuth({
         // Generate the login link email using our React template
         const emailHtml = generateLoginLinkEmailHTML(user.name || "User", url);
 
-        // Send the email using Resend
+        // Send the email
         await sendEmail({
           to: user.email,
           subject: "Your SLTC IEEE Admin Portal Access",

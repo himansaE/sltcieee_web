@@ -156,17 +156,47 @@ model OrganizationUnit {
   description String
   image       String
   createdAt   DateTime
+  posts       Post[]
   @@map("organizationUnit")
   events Event[]
 }
 
-model Person {
+model Author {
+  id        String   @id @map("_id") @default(cuid())
+  name      String
+  bio       String
+  createdAt DateTime @default(now())
+  posts     Post[]   @relation(fields: [postIds], references: [id])
+  postIds   String[]
+  @@map("author")
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model Post {
   id          String   @id @map("_id") @default(cuid())
-  name        String
-  image       String
-  createdAt   DateTime
-  linkedin    String
-  @@map("person")
+  slug        String   @unique
+  title       String
+  content     String
+  coverImage  String
+  excerpt     String
+  tags        String[]
+  status      PostStatus @default(DRAFT)
+  
+  createdAt   DateTime @default(now())
+  publishedAt DateTime?
+  updatedAt   DateTime @updatedAt
+
+  authors     Author[] @relation(fields: [authorIds], references: [id])
+  authorIds   String[]
+  
+  organizationUnitId String?
+  organizationUnit OrganizationUnit? @relation(fields: [organizationUnitId], references: [id])
+  
+  @@map("post")
 }
 
 model EventGalleryItem {

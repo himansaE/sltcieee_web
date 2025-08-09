@@ -106,7 +106,7 @@ export function DeleteUnitDialog({ unit, onDeleted }: DeleteUnitDialogProps) {
                           Content
                         </Badge>
                         <span className="text-muted-foreground">
-                          Unit articles & content
+                          Unit blogs & content
                         </span>
                       </li>
                     </ul>

@@ -6,6 +6,7 @@ import prisma from "@/lib/prisma";
 import { createId } from "@paralleldrive/cuid2";
 import { organizationUnitReqValidationSchema } from "@/lib/validation/organizationUnit";
 import * as Yup from "yup";
+import { slugify } from "@/lib/utils";
 
 export async function POST(req: NextRequest) {
   const role = await checkAuth([Role.admin]);
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
 
-    // Validate request body
+    // Validate request body (no slug required on create)
     try {
       await organizationUnitReqValidationSchema.validate(data, {
         abortEarly: false,
@@ -30,25 +31,44 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Check for duplicate slug
-    const existingUnit = await prisma.organizationUnit.findFirst({
-      where: { slug: data.slug },
-    });
+    const title = typeof data.title === "string" ? data.title.trim() : "";
+    const description =
+      typeof data.description === "string" ? data.description.trim() : "";
 
-    if (existingUnit) {
+    if (!title || !description) {
       return NextResponse.json(
-        { error: "An organization unit with this slug already exists" },
+        { error: "Title and description are required" },
         { status: 400 }
       );
+    }
+
+    // Generate slug from title
+    const baseSlug = slugify(title);
+    if (!baseSlug) {
+      return NextResponse.json(
+        { error: "Invalid title provided" },
+        { status: 400 }
+      );
+    }
+
+    // Ensure uniqueness
+    let uniqueSlug = baseSlug;
+    const exists = await prisma.organizationUnit.findUnique({
+      where: { slug: uniqueSlug },
+      select: { id: true },
+    });
+
+    if (exists) {
+      uniqueSlug = `${baseSlug}-${createId().slice(0, 8)}`;
     }
 
     const organizationUnit = await prisma.organizationUnit.create({
       data: {
         id: createId(),
-        title: data.title.trim(),
-        description: data.description.trim(),
+        title,
+        description,
         image: data.image,
-        slug: data.slug.trim(),
+        slug: uniqueSlug,
         createdAt: new Date(),
       },
     });

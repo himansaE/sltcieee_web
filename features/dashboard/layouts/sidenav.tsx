@@ -20,6 +20,7 @@ import { navLinks } from "../data/navData";
 import Image from "next/image";
 import { authClient } from "@/lib/auth/client";
 import Link from "next/link";
+import type { Role } from "@prisma/client";
 // This is sample data.
 
 type AdminSideNavProps = {
@@ -28,6 +29,19 @@ type AdminSideNavProps = {
 export const AdminSideNav: React.FC<AdminSideNavProps> = (props) => {
   const user = authClient.useSession();
   if (!user) return null;
+
+  const role = (user.data?.user.role as Role) || "user";
+  const allowedForContent = new Set([
+    "/admin/dashboard",
+    "/admin/blog",
+    "/admin/authors",
+  ]);
+
+  const items = navLinks.filter((item) => {
+    if (role === "admin") return true;
+    if (role === "content") return allowedForContent.has(item.url);
+    return false;
+  });
 
   return (
     <SidebarProvider>
@@ -65,7 +79,7 @@ export const AdminSideNav: React.FC<AdminSideNavProps> = (props) => {
           <SidebarGroup className="mt-4">
             <SidebarGroupLabel>Platform</SidebarGroupLabel>
             <SidebarMenu>
-              {navLinks.map((item) => (
+              {items.map((item) => (
                 <SidebarMenuButton
                   tooltip={item.title}
                   key={item.title}
