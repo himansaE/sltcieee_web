@@ -3,12 +3,10 @@
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import Spinner from "@/components/ui/spinner";
 import { PlusIcon, Search, FileX, X } from "lucide-react";
 import { usePosts, PostsFilter } from "@/hooks/usePosts";
 import { PostFilters, PostFiltersRef } from "@/features/blog/components/PostFilters";
 import { PostTable } from "@/features/blog/components/PostTable";
-import { Pagination } from "@/components/ui/pagination";
 import { PostsGridSkeleton } from "@/features/blog/components/PostCardSkeleton";
 
 const ITEMS_PER_PAGE = 12;

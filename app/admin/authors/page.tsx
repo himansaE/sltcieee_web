@@ -1,55 +1,19 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { toast } from "sonner";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import Spinner from "@/components/ui/spinner";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { PenSquare, PlusIcon, Search, UserX, X } from "lucide-react";
+import { PenSquare, Search, UserX, X } from "lucide-react";
 import { useAuthors } from "@/hooks/useAuthors";
 import type { AuthorsFilter } from "@/hooks/useAuthors";
 import { AuthorFilters, AuthorFiltersRef } from "@/features/authors/components/authorFilters";
 import { AuthorsGridSkeleton } from "@/features/authors/components/authorSkeleton";
 import { Pagination } from "@/components/ui/pagination";
 import type { Author } from "@prisma/client";
+import { AddAuthorDialog } from "@/features/authors/components/addAuthorDialog";
 
 const ITEMS_PER_PAGE = 9;
-
-async function createAuthor(newAuthor: {
-  name: string;
-  bio: string;
-}): Promise<Author> {
-  const response = await fetch("/api/admin/authors", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(newAuthor),
-  });
-  if (!response.ok) {
-    throw new Error("Failed to create author");
-  }
-  return response.json();
-}
-
-import { AddAuthorDialog } from "@/features/authors/components/addAuthorDialog";
 
 export default function AuthorsPage() {
   const queryClient = useQueryClient();
@@ -96,11 +60,7 @@ export default function AuthorsPage() {
         <AddAuthorDialog onSuccess={handleSuccess} />
       </div>
 
-      <AuthorFilters
-        ref={filtersRef}
-        onFilterChange={setFilters}
-        filtersList={filters}
-      />
+      <AuthorFilters ref={filtersRef} onFilterChange={setFilters} filtersList={filters} />
 
       {isLoading ? (
         <AuthorsGridSkeleton />
@@ -123,11 +83,7 @@ export default function AuthorsPage() {
                 : "Get started by creating your first author. Authors will be displayed here and can be managed from this dashboard."}
             </p>
             {hasActiveFilters ? (
-              <Button
-                variant="outline"
-                onClick={clearFilters}
-                className="gap-2"
-              >
+              <Button variant="outline" onClick={clearFilters} className="gap-2">
                 <X className="h-4 w-4" />
                 Clear Filters
               </Button>
@@ -139,7 +95,7 @@ export default function AuthorsPage() {
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {authors.map((author) => (
+            {authors.map((author: Author) => (
               <Card key={author.id}>
                 <CardHeader className="flex flex-row items-center gap-4">
                   <div className="p-3 rounded-full bg-primary/10">

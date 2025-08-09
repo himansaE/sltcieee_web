@@ -14,6 +14,7 @@ import {
 import { AuthorsGridSkeleton } from "@/features/authors/components/authorSkeleton";
 import { Pagination } from "@/components/ui/pagination";
 import { AddAuthorDialog } from "@/features/authors/components/addAuthorDialog";
+import type { Author } from "@prisma/client";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -101,7 +102,7 @@ export default function AuthorsClient() {
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {authors.map((author: any) => (
+            {authors.map((author: Author) => (
               <Card key={author.id}>
                 <CardHeader className="flex flex-row items-center gap-4">
                   <div className="p-3 rounded-full bg-primary/10">
