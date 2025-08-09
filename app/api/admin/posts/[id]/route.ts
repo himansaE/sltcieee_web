@@ -53,7 +53,7 @@ export async function PUT(
       publishedAt: string | null;
     }>;
 
-    let {
+    const {
       title,
       slug,
       content,
@@ -91,7 +91,7 @@ export async function PUT(
       ...(status !== undefined ? { status } : {}),
       ...(newOrgId !== undefined ? { organizationUnitId: newOrgId } : {}),
       ...(publishedAt !== undefined
-        ? { publishedAt: publishedAt ? new Date(publishedAt as any) : null }
+        ? { publishedAt: publishedAt ? new Date(publishedAt as string) : null }
         : {}),
       ...(authorIds !== undefined
         ? {
