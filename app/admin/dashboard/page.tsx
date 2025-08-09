@@ -1,5 +1,12 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "IEEE SLTC Admin Dashboard",
+};
+
 export default function Dashboard() {
   return (
     <div>
