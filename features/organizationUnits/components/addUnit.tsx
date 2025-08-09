@@ -20,7 +20,7 @@ import { useMutation } from "@tanstack/react-query";
 import { uploadFile } from "@/lib/api/uploadFile";
 import Spinner from "@/components/ui/spinner";
 import { toast } from "sonner";
-import { organizationUnitValidationSchema } from "@/lib/validation/organizationUnit";
+import { organizationUnitCreateValidationSchema } from "@/lib/validation/organizationUnit";
 import { createOrganizationUnit } from "@/lib/api/organizationUnitFn";
 
 interface AddNewOrganizationUnitProps {
@@ -39,9 +39,8 @@ export default function AddNewOrganizationUnit({
       logo: null,
       title: "",
       description: "",
-      slug: "",
     },
-    validationSchema: organizationUnitValidationSchema,
+    validationSchema: organizationUnitCreateValidationSchema,
     onSubmit: async (values) => {
       const msg = toast.loading("Uploading Organization Unit Logo...");
 
@@ -174,18 +173,6 @@ export default function AddNewOrganizationUnit({
             placeholder="Enter event title"
             errorMessage={(formik.touched.title && formik.errors.title) || ""}
             disabled={isCreatingOrganizationUnit || isUploading}
-          />
-
-          <TextInput
-            id="slug"
-            name="slug"
-            label="URL Slug"
-            value={formik.values.slug}
-            onChange={formik.handleChange}
-            placeholder="organization-unit-url-slug"
-            errorMessage={(formik.touched.slug && formik.errors.slug) || ""}
-            disabled={isCreatingOrganizationUnit || isUploading}
-            instructionMessage="URL-friendly version of the title (lowercase letters, numbers, and hyphens only)"
           />
 
           <div>
