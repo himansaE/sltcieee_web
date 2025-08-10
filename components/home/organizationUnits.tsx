@@ -252,7 +252,7 @@ const OrganizationUnits: FC = () => {
               className="group flex items-center justify-center w-8 h-8 transition-all duration-300 hover:scale-105"
               aria-label="Previous organization unit"
             >
-              <ChevronLeft className="w-3.5 h-3.5 text-white group-hover:text-blue-300 transition-colors duration-300" />
+              <ChevronLeft className="w-3.5 h-3.5 text-white group-hover:text-[#76bde3] transition-colors duration-300" />
             </button>
 
             {/* Progress Indicator Line Buttons */}
@@ -263,7 +263,7 @@ const OrganizationUnits: FC = () => {
                   className={cn(
                     "h-0.5 rounded-full transition-all duration-500 ease-out cursor-pointer",
                     selectedUnit === index
-                      ? `w-6 ${surroundingLogosData[selectedUnit]?.lineColorClass || "bg-blue-500"}`
+                      ? `w-6 ${surroundingLogosData[selectedUnit]?.lineColorClass || "bg-[#0166aa]"}`
                       : "w-1.5 bg-gray-600 hover:bg-gray-500"
                   )}
                   onClick={() => goToUnit(index)}
@@ -292,7 +292,7 @@ const OrganizationUnits: FC = () => {
               className="group flex items-center justify-center w-4 h-4  transition-all duration-300 hover:scale-105"
               aria-label="Next organization unit"
             >
-              <ChevronRight className="w-3.5 h-3.5 text-white group-hover:text-blue-300 transition-colors duration-300" />
+              <ChevronRight className="w-3.5 h-3.5 text-white group-hover:text-[#76bde3] transition-colors duration-300" />
             </button>
           </div>
           {/* Enhanced content with smooth animations */}
@@ -316,11 +316,11 @@ const OrganizationUnits: FC = () => {
           </div>{" "}
           <Button
             className={cn(
-              "group relative bg-cyan-500 hover:bg-cyan-600",
+              "group relative bg-[#0166aa] hover:bg-[#015a93]",
               "text-white font-semibold py-3.5 px-8 rounded-full text-lg",
-              "transition-all duration-300 shadow-lg shadow-cyan-500/30",
-              "hover:shadow-xl hover:shadow-cyan-500/50 transform hover:scale-105",
-              "border border-cyan-400/20 hover:border-cyan-300/30"
+              "transition-all duration-300 shadow-lg shadow-[#0166aa]/30",
+              "hover:shadow-xl hover:shadow-[#0166aa]/50 transform hover:scale-105",
+              "border border-[#0166aa]/20 hover:border-[#0166aa]/30"
             )}
           >
             <span className="relative z-10 flex items-center gap-1.5">
@@ -340,7 +340,7 @@ const OrganizationUnits: FC = () => {
               </svg>
             </span>
             {/* Button glow effect */}
-            <div className="absolute inset-0 rounded-full bg-cyan-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl"></div>
+            <div className="absolute inset-0 rounded-full bg-[#0166aa] opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl"></div>
           </Button>
         </div>
         {/* Right Graphical Content */}
@@ -351,7 +351,7 @@ const OrganizationUnits: FC = () => {
           {/* Central Logo - Restored to your original positioning */}
           <div
             ref={mainLogoRef}
-            className="absolute right-0 z-20 rounded-full shadow-lg shadow-blue-500/50 flex items-center justify-center border-2 border-[#005A96] translate-x-1/2"
+            className="absolute right-0 z-20 rounded-full shadow-lg shadow-[#0166aa]/50 flex items-center justify-center border-2 border-[#005A96] translate-x-1/2"
             style={{ boxShadow: "-1px 1px 221.8px #005A96" }}
           >
             <Image

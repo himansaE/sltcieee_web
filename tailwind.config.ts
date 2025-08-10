@@ -111,7 +111,7 @@ const config: Config = {
       },
       fontFamily: {
         primary: ["var(--font-wix-madefor-display)"],
-        secondary: ["var(--font-poppins)"],
+  secondary: ["var(--font-figtree)"],
       },
       // borderRadius: {
       // 	lg: 'var(--radius)',
