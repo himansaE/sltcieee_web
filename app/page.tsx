@@ -8,16 +8,16 @@ export const metadata: Metadata = {
 import ContactUs from "@/components/home/contactUs";
 import Footer from "@/components/home/footer";
 import JoinUs from "@/components/home/joinUs";
-import LandingPage from "@/components/home/landingPage";
 import OrganizationUnits from "@/components/home/organizationUnits";
 import StatsSection from "@/components/home/statsSection";
 import { TopNav } from "@/components/home/topNav";
+import ActiveHero from "@/components/home/ActiveHero";
 
 export default function Home() {
   return (
     <div>
       <TopNav />
-      <LandingPage />
+   <ActiveHero />
       <AboutUsBento />
       <JoinUs />
       <StatsSection />

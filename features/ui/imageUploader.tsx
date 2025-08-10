@@ -13,12 +13,14 @@ interface ImageUploaderProps {
   onUploadComplete: (imageUrl: string) => void;
   initialImage?: string | null;
   uploadPath: string; // e.g., "blog/covers"
+  disabled?: boolean;
 }
 
 export function ImageUploader({
   onUploadComplete,
   initialImage,
   uploadPath,
+  disabled = false,
 }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string | null>(initialImage || null);
   const [isUploading, setIsUploading] = useState(false);
@@ -29,6 +31,7 @@ export function ImageUploader({
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
+      if (disabled) return;
       const file = acceptedFiles[0];
       if (!file) return;
 
@@ -53,7 +56,7 @@ export function ImageUploader({
         URL.revokeObjectURL(tempPreview);
       }
     },
-    [uploadFileMutation, onUploadComplete, uploadPath, initialImage]
+  [uploadFileMutation, onUploadComplete, uploadPath, initialImage, disabled]
   );
 
   const {
@@ -67,7 +70,7 @@ export function ImageUploader({
     accept: { "image/*": [".jpeg", ".jpg", ".png", ".webp"] },
     maxFiles: 1,
     multiple: false,
-    disabled: isUploading,
+    disabled: isUploading || disabled,
     maxSize: 5 * 1024 * 1024, // 5MB
   });
 
@@ -77,7 +80,7 @@ export function ImageUploader({
     isDragActive && "border-primary/50 bg-primary/5",
     isDragAccept && "border-green-500/50 bg-green-500/5",
     isDragReject && "border-red-500/50 bg-red-500/5",
-    isUploading && "cursor-not-allowed"
+  (isUploading || disabled) && "cursor-not-allowed opacity-70 pointer-events-none"
   );
 
   const handleRemoveImage = (e: React.MouseEvent) => {
@@ -86,12 +89,12 @@ export function ImageUploader({
     onUploadComplete(""); // Notify parent that image is removed
   };
 
-  const resolvedPreview =
-    preview && preview.startsWith("blob:")
-      ? preview
-      : preview
-      ? getImageUrl(preview)
-      : null;
+  const resolvedPreview = (() => {
+    if (!preview) return null;
+    if (preview.startsWith("blob:")) return preview;
+    if (/^https?:\/\//i.test(preview)) return preview;
+    return getImageUrl(preview);
+  })();
 
   return (
     <div {...getRootProps()} className={dropzoneClasses}>
@@ -109,7 +112,7 @@ export function ImageUploader({
             type="button"
             onClick={handleRemoveImage}
             className="absolute top-2 right-2 bg-background/80 text-destructive rounded-full p-1.5 z-10"
-            disabled={isUploading}
+            disabled={isUploading || disabled}
           >
             <X className="h-4 w-4" />
           </button>
