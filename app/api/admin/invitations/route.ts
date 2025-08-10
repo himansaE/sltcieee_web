@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { Role } from "@prisma/client";
 import { checkAuth } from "@/lib/auth/server";
 import { authError } from "@/lib/auth/error";
 import { getPendingInvitations } from "@/lib/services/invitation";
 
 // GET /api/admin/invitations - list pending invitations
-export async function GET(req: NextRequest) {
+export async function GET() {
   const role = await checkAuth([Role.admin]);
   if (!role) return NextResponse.json(...authError);
 
