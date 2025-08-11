@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -30,6 +30,7 @@ export default function RoundTablePage() {
 
   const [local, setLocal] = useState<string[]>(["", "", "", "", ""]);
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   useEffect(() => {
     if (data?.photos) setLocal(data.photos);
@@ -45,12 +46,13 @@ export default function RoundTablePage() {
   });
 
   const handleUpload = async (idx: number, file: File) => {
+    let tempUrl: string | undefined;
     try {
       setUploadingIndex(idx);
-      const tempUrl = URL.createObjectURL(file);
+      tempUrl = URL.createObjectURL(file);
       setLocal((arr) => {
         const next = [...arr];
-        next[idx] = tempUrl;
+        next[idx] = tempUrl!;
         return next;
       });
 
@@ -65,7 +67,15 @@ export default function RoundTablePage() {
       console.error(e);
       toast.error("Upload failed");
     } finally {
-      if (typeof window !== "undefined") URL.revokeObjectURL(local[idx]!);
+  if (typeof window !== "undefined")
+        try {
+          // Revoke only the temporary blob URL we created
+          // Using a local variable ensures we don't accidentally revoke a storage key
+          inputRefs.current[idx]?.form?.reset?.();
+          // Best-effort revoke
+          // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+          tempUrl && URL.revokeObjectURL(tempUrl);
+        } catch {}
       setUploadingIndex(null);
     }
   };
@@ -128,28 +138,37 @@ export default function RoundTablePage() {
               )}
 
               <div className="absolute inset-x-0 bottom-0 p-3 flex gap-2 justify-end bg-gradient-to-t from-black/40 to-transparent">
-                <label className={cn("inline-flex")}>
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (f) handleUpload(idx, f);
-                    }}
-                    disabled={busy}
-                  />
-                  <Button size="sm" variant="secondary" disabled={busy}>
-                    {busy ? (
-                      <>
-                        <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
-                        Uploading
-                      </>
-                    ) : (
-                      "Upload"
-                    )}
-                  </Button>
-                </label>
+                <input
+                  ref={(el) => {
+                    inputRefs.current[idx] = el;
+                  }}
+                  id={`round-table-file-${idx}`}
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleUpload(idx, f);
+                    // Clear value so selecting the same file later re-triggers change
+                    if (e.currentTarget) e.currentTarget.value = "";
+                  }}
+                  disabled={busy}
+                />
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  disabled={busy}
+                  onClick={() => inputRefs.current[idx]?.click()}
+                >
+                  {busy ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+                      Uploading
+                    </>
+                  ) : (
+                    "Upload"
+                  )}
+                </Button>
                 {val && (
                   <Button size="sm" variant="destructive" onClick={() => handleRemove(idx)} disabled={busy}>
                     Remove

@@ -13,15 +13,15 @@ import StatsSection from "@/components/home/statsSection";
 import { TopNav } from "@/components/home/topNav";
 import ActiveHero from "@/components/home/ActiveHero";
 
-export default function Home() {
+export default async function Home() {
   return (
     <div>
       <TopNav />
-   <ActiveHero />
+      <ActiveHero />
       <AboutUsBento />
       <JoinUs />
       <StatsSection />
-      <OrganizationUnits />
+  <OrganizationUnits />
       <ContactUs />
       <Footer />
     </div>

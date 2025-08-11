@@ -1,44 +1,49 @@
 "use client";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import React from "react";
-import { cn } from "@/lib/utils";
+import React, { useEffect, useMemo, useState } from "react";
+import { cn, getImageUrl } from "@/lib/utils";
 import Link from "next/link";
+import Request from "@/lib/http";
 
 const ContactUs = () => {
-  // Placeholder team member images - replace with actual team photos
-  const teamMembers = [
-    {
-      id: 1,
-      src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-      alt: "Team Member 1",
-      name: "John Doe",
-    },
-    {
-      id: 2,
-      src: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-      alt: "Team Member 2",
-      name: "Jane Smith",
-    },
-    {
-      id: 3,
-      src: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-      alt: "Team Member 3",
-      name: "Mike Johnson",
-    },
-    {
-      id: 4,
-      src: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-      alt: "Team Member 4",
-      name: "Sarah Wilson",
-    },
-    {
-      id: 5,
-      src: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
-      alt: "Team Member 5",
-      name: "Alex Brown",
-    },
-  ];
+  // Load round-table photos (storage keys) from public API
+  const [photos, setPhotos] = useState<string[]>(["", "", "", "", ""]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await Request.get("/api/round-table");
+        const list = (res?.data?.photos ?? []) as string[];
+        if (isMounted) setPhotos(Array.from({ length: 5 }, (_, i) => list[i] ?? ""));
+      } catch (e) {
+        console.error("Failed to load round table", e);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Map to priority layout: 1st=center, 2nd=left of center, 3rd=right of center, 4th=further left, 5th=further right
+  const ordered = useMemo(() => {
+    const cleaned = photos.filter(Boolean);
+    const slots = ["", "", "", "", ""]; // visual left->right
+    // We will render 5 positions if available; otherwise, only those that exist.
+    // Desired placement indices visually: [farLeft, left, center, right, farRight] -> mapping = [3rd?, 2nd, 1st, 3rd, 4th?]
+    // But per requirement: 1st=center, 2nd=left, 3rd=right, 4th=further left, 5th=further right.
+    if (cleaned[0]) slots[2] = cleaned[0]; // center
+    if (cleaned[1]) slots[1] = cleaned[1]; // left of center
+    if (cleaned[2]) slots[3] = cleaned[2]; // right of center
+    if (cleaned[3]) slots[0] = cleaned[3]; // further left
+    if (cleaned[4]) slots[4] = cleaned[4]; // further right
+    // Trim out empty slots when fewer than 5 images to avoid rendering empties
+    return slots.filter(Boolean) as string[];
+  }, [photos]);
   return (
     <section
       id="contact"
@@ -82,31 +87,33 @@ const ContactUs = () => {
             {/* Team Members Row Layout - Matching Screenshot */}
             <div className="flex justify-center lg:justify-end mb-4">
               <div className="relative flex items-center">
-                {teamMembers.map((member, index) => (
-                  <div
-                    key={member.id}
-                    className="relative transition-all duration-300 hover:scale-110 hover:z-10"
-                    style={{
-                      marginLeft: index > 0 ? "-16px" : "0", // More overlapping like screenshot
-                      zIndex:
-                        teamMembers.length -
-                        Math.abs(index - Math.floor(teamMembers.length / 2)),
-                    }}
-                  >
-                    <div className="relative">
-                      <div className="w-16 h-16 md:w-18 md:h-18 rounded-full overflow-hidden border-3 border-white/40 hover:border-green-400 transition-all duration-300 shadow-lg hover:shadow-green-500/30">
-                        <Image
-                          src={member.src}
-                          alt={member.alt}
-                          width={72}
-                          height={72}
-                          className="w-full h-full object-cover"
-                          unoptimized
-                        />
+                {ordered.map((key, index) => {
+                  const src = /^https?:\/\//.test(key) ? key : getImageUrl(key);
+                  const centerIndex = Math.floor(ordered.length / 2);
+                  return (
+                    <div
+                      key={`${key}-${index}`}
+                      className="relative transition-all duration-300 hover:scale-110 hover:z-10"
+                      style={{
+                        marginLeft: index > 0 ? "-16px" : "0",
+                        zIndex: ordered.length - Math.abs(index - centerIndex),
+                      }}
+                    >
+                      <div className="relative">
+                        <div className="w-16 h-16 md:w-18 md:h-18 rounded-full overflow-hidden border-3 border-white/40 hover:border-green-400 transition-all duration-300 shadow-lg hover:shadow-green-500/30">
+                          <Image
+                            src={src}
+                            alt={`Round table member ${index + 1}`}
+                            width={72}
+                            height={72}
+                            className="w-full h-full object-cover"
+                            unoptimized
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>{" "}
             {/* Contact Information */}

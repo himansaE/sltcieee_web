@@ -82,52 +82,7 @@ export function OrganizationUnitPage({ unit }: OrganizationUnitPageProps) {
     <div className="min-h-screen bg-black text-white">
       <TopNav />
 
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-blue-900/20" />
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-8">
-            <div className="relative w-40 h-40 mx-auto mb-8 group">
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full blur-xl opacity-50" />
-              <div className="relative w-full h-full bg-white rounded-full p-4 group-hover:scale-110 transition-transform duration-300">
-                <Image
-                  src={getImageUrl(unit.image)}
-                  alt={unit.title}
-                  fill
-                  className="object-contain rounded-full"
-                  unoptimized
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-white via-cyan-200 to-blue-300 bg-clip-text text-transparent">
-                {unit.title}
-              </span>
-            </h1>
-            <p className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
-              {unit.description}
-            </p>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button
-              variant="outline"
-              size="lg"
-              asChild
-              className="border-cyan-400 bg-cyan-400 text-black font-semibold px-8 py-4 rounded-full text-lg transition-all duration-300 transform hover:scale-105"
-            >
-              <Link href="#upcoming-events">
-                View Events
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+  
 
       {/* About Section */}
       <section className="py-20 relative bg-black">
@@ -143,8 +98,8 @@ export function OrganizationUnitPage({ unit }: OrganizationUnitPageProps) {
                 "md:col-span-5 text-center": totalEvents === 0,
               })}
             >
-              <h2 className="text-4xl sm:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent">
-                About {unit.title}
+              <h2 className="text-4xl sm:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mt-20">
+                 {unit.title}
               </h2>
               <div
                 className={cn(

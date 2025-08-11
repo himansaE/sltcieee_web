@@ -132,6 +132,9 @@ const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>(function CardSwap(
       const tl = gsap.timeline();
       tlRef.current = tl;
 
+      // Notify early: the next front will be rest[0]
+      if (typeof rest[0] === "number") onActiveChange?.(rest[0]);
+
       tl.to(elFront, { y: "+=500", duration: config.durDrop, ease: config.ease });
 
       tl.addLabel("promote", `-=${config.durDrop * config.promoteOverlap}`);
@@ -156,42 +159,15 @@ const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>(function CardSwap(
 
       tl.call(() => {
         order.current = [...rest, front];
-        onActiveChange?.(order.current[0]);
       });
     };
 
-    const swapBackward = () => {
-      if (order.current.length < 2) return;
-      const arr = order.current;
-      const last = arr[arr.length - 1];
-      const rest = arr.slice(0, arr.length - 1);
-      const elBack = refs[last].current!;
-      const tl = gsap.timeline();
-      tlRef.current = tl;
-
-      // Move others to next slot instantly with light animation
-      rest.forEach((idx, i) => {
-        const el = refs[idx].current!;
-        const slot = makeSlot(i + 1, cardDistance, verticalDistance, refs.length);
-        tl.to(el, { x: slot.x, y: slot.y, z: slot.z, duration: config.durMove * 0.8, ease: config.ease }, i === 0 ? 0 : "<0.05");
-        tl.set(el, { zIndex: slot.zIndex }, "<");
-      });
-
-      // Animate back card to front
-      const frontSlot = makeSlot(0, cardDistance, verticalDistance, refs.length);
-      tl.set(elBack, { zIndex: frontSlot.zIndex });
-      tl.to(elBack, { x: frontSlot.x, y: frontSlot.y, z: frontSlot.z, duration: config.durReturn, ease: config.ease }, "<0.05");
-
-      tl.call(() => {
-        order.current = [last, ...rest];
-        onActiveChange?.(order.current[0]);
-      });
-    };
+  // backward swap logic exists in imperative prev()
 
     // initial active callback
     onActiveChange?.(order.current[0]);
 
-    if (autoPlay) {
+  if (autoPlay) {
       swap();
       intervalRef.current = window.setInterval(swap, delay);
     }
@@ -215,11 +191,11 @@ const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>(function CardSwap(
       };
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, easing, autoPlay, onActiveChange]);
+  }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, easing, autoPlay, onActiveChange, refs, childArr, config.durDrop, config.durMove, config.durReturn, config.ease, config.promoteOverlap, config.returnDelay]);
 
   // expose controls
   React.useImperativeHandle(ref, () => ({
-    next: () => {
+  next: () => {
       // reuse the same logic as in effect by triggering one forward swap manually
       // Implement a minimal forward move by reusing tl
       if (!refs.length) return;
@@ -228,11 +204,12 @@ const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>(function CardSwap(
       refs.forEach((r, i) => r.current && placeNow(r.current, makeSlot(i, cardDistance, verticalDistance, total), skewAmount));
       // forward timeline same as swap in effect
       // Duplicate logic
-      const [front, ...rest] = order.current;
+  const [front, ...rest] = order.current;
       const elFront = refs[front].current!;
       const tl = gsap.timeline();
       tlRef.current = tl;
       const cfg = config;
+  if (typeof rest[0] === "number") onActiveChange?.(rest[0]);
       tl.to(elFront, { y: "+=500", duration: cfg.durDrop, ease: cfg.ease });
       tl.addLabel("promote", `-=${cfg.durDrop * cfg.promoteOverlap}`);
       rest.forEach((idx, i) => {
@@ -246,17 +223,18 @@ const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>(function CardSwap(
       tl.call(() => { gsap.set(elFront, { zIndex: backSlot.zIndex }); }, undefined, "return");
       tl.set(elFront, { x: backSlot.x, z: backSlot.z }, "return");
       tl.to(elFront, { y: backSlot.y, duration: cfg.durReturn, ease: cfg.ease }, "return");
-      tl.call(() => { order.current = [...rest, front]; onActiveChange?.(order.current[0]); });
+  tl.call(() => { order.current = [...rest, front]; });
     },
     prev: () => {
       if (!refs.length) return;
       const arr = order.current;
       const last = arr[arr.length - 1];
       const rest = arr.slice(0, arr.length - 1);
-      const elBack = refs[last].current!;
+  const elBack = refs[last].current!;
       const tl = gsap.timeline();
       tlRef.current = tl;
       const cfg = config;
+  onActiveChange?.(last);
       rest.forEach((idx, i) => {
         const el = refs[idx].current!;
         const slot = makeSlot(i + 1, cardDistance, verticalDistance, refs.length);
@@ -266,7 +244,7 @@ const CardSwap = forwardRef<CardSwapHandle, CardSwapProps>(function CardSwap(
       const frontSlot = makeSlot(0, cardDistance, verticalDistance, refs.length);
       tl.set(elBack, { zIndex: frontSlot.zIndex });
       tl.to(elBack, { x: frontSlot.x, y: frontSlot.y, z: frontSlot.z, duration: cfg.durReturn, ease: cfg.ease }, "<0.05");
-      tl.call(() => { order.current = [last, ...rest]; onActiveChange?.(order.current[0]); });
+  tl.call(() => { order.current = [last, ...rest]; });
     },
     getActiveIndex: () => order.current[0] ?? 0,
   }));
