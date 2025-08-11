@@ -87,7 +87,7 @@ export const TopNav = () => {
             {/* <Button
               size="sm"
               variant="default"
-              className="ml-4 group relative bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-full px-5 py-2 text-xs transition-all duration-300 shadow-md shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/50 border border-cyan-400/20 hover:border-cyan-300/30 focus:outline-none"
+              className="ml-4 group relative bg-[#0166aa] hover:bg-[#015a93] text-white font-semibold rounded-full px-5 py-2 text-xs transition-all duration-300 shadow-md shadow-[#0166aa]/30 hover:shadow-xl hover:shadow-[#0166aa]/50 border border-[#0166aa]/20 hover:border-[#0166aa]/30 focus:outline-none"
             >
               <span className="relative z-10 flex items-center gap-1.5">
                 Subscribe
@@ -105,7 +105,7 @@ export const TopNav = () => {
                   />
                 </svg>
               </span>
-              <div className="absolute inset-0 rounded-full bg-cyan-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl"></div>
+              <div className="absolute inset-0 rounded-full bg-[#0166aa] opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl"></div>
             </Button> */}
           </div>
 
@@ -203,7 +203,7 @@ export const TopNav = () => {
                   {/* Footer */}
                   <div className="mt-auto p-5 bg-slate-900/80">
                     <Button
-                      className="w-full group relative bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-full h-12 text-base transition-all duration-300 shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/50 border border-cyan-400/20 hover:border-cyan-300/30 focus:outline-none"
+                      className="w-full group relative bg-[#0166aa] hover:bg-[#015a93] text-white font-semibold rounded-full h-12 text-base transition-all duration-300 shadow-lg shadow-[#0166aa]/30 hover:shadow-xl hover:shadow-[#0166aa]/50 border border-[#0166aa]/20 hover:border-[#0166aa]/30 focus:outline-none"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <span className="relative z-10 flex items-center gap-1.5">
@@ -222,7 +222,7 @@ export const TopNav = () => {
                           />
                         </svg>
                       </span>
-                      <div className="absolute inset-0 rounded-full bg-cyan-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl"></div>
+                      <div className="absolute inset-0 rounded-full bg-[#0166aa] opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl"></div>
                     </Button>
                   </div>
                 </div>

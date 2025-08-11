@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import MarqueeText, { MarqueeTextItem } from "./marqueeText";
+import CurvedLoopSection from "./marqueeText";
 
 interface ProjectCard {
   id: number;
@@ -64,14 +64,7 @@ const projectCards: ProjectCard[] = [
   },
 ];
 
-const marqueeTexts: MarqueeTextItem[] = [
-  { text: "SLTC", type: "filled" },
-  { text: "IEEE", type: "stroke" },
-  { text: "•", type: "filled" },
-  { text: "YOUNG", type: "filled" },
-  { text: "PROFESSIONALS", type: "stroke" },
-  { text: "•", type: "filled" },
-];
+// Removed marqueeTexts; replaced by CurvedLoopSection with fixed text
 
 export default function LandingPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -170,12 +163,13 @@ export default function LandingPage() {
     [currentSlide]
   );
   return (
-    <div
-      id="events"
-      className="relative h-screen w-full overflow-hidden bg-black"
-    >
-      {" "}
-      {/* Enhanced Animated Background with Beautiful Carousel Effects */}
+    <>
+      <div
+        id="events"
+        className="relative h-screen w-full overflow-hidden bg-black"
+      >
+        {" "}
+        {/* Enhanced Animated Background with Beautiful Carousel Effects */}
       <div className="absolute inset-0 z-0">
         {/* Main Background Image Layer with 3D perspective */}
         <div
@@ -252,19 +246,19 @@ export default function LandingPage() {
         {/* Floating Particles System - Better Alternative */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-5">
           {/* Large floating orbs */}
-          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-400/20 rounded-full blur-2xl animate-float-slow"></div>
+          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-[#0166aa]/20 rounded-full blur-2xl animate-float-slow"></div>
           <div className="absolute top-3/4 right-1/4 w-24 h-24 bg-purple-400/20 rounded-full blur-2xl animate-float-reverse"></div>
           <div className="absolute bottom-1/3 left-1/3 w-20 h-20 bg-pink-400/20 rounded-full blur-xl animate-float"></div>
 
           {/* Small sparkles */}
           <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-white/60 rounded-full animate-twinkle"></div>
-          <div className="absolute top-1/3 right-1/3 w-1.5 h-1.5 bg-blue-300/80 rounded-full animate-twinkle-delay"></div>
+          <div className="absolute top-1/3 right-1/3 w-1.5 h-1.5 bg-[#0166aa]/80 rounded-full animate-twinkle-delay"></div>
           <div className="absolute bottom-1/4 right-1/2 w-1 h-1 bg-purple-300/80 rounded-full animate-twinkle-slow"></div>
           <div className="absolute top-2/3 left-3/4 w-1.5 h-1.5 bg-pink-300/80 rounded-full animate-twinkle"></div>
 
           {/* Geometric shapes */}
           <div className="absolute top-1/5 right-1/5 w-8 h-8 border border-white/20 rotate-45 animate-spin-slow-reverse"></div>
-          <div className="absolute bottom-1/5 left-1/5 w-6 h-6 border border-blue-300/30 animate-pulse-slow"></div>
+          <div className="absolute bottom-1/5 left-1/5 w-6 h-6 border border-[#0166aa]/30 animate-pulse-slow"></div>
         </div>
       </div>
       {/* Animated Top Logo */}
@@ -287,7 +281,7 @@ export default function LandingPage() {
         </Button>{" "}
         {/* Enhanced Project Card with Glass Morphism */}{" "}
         <Card
-          className="bg-white/10 backdrop-blur-3xl border border-white/20 p-12 max-w-2xl mx-auto text-center transform transition-all duration-700 hover:scale-105 hover:shadow-2xl hover:shadow-[#2563eb]/20 group animate-slide-up shadow-2xl shadow-black/50 hover:border-[#2563eb]/30"
+          className="bg-white/10 backdrop-blur-3xl border border-white/20 p-12 max-w-2xl mx-auto text-center transform transition-all duration-700 hover:scale-105 hover:shadow-2xl hover:shadow-[#0166aa]/20 group animate-slide-up shadow-2xl shadow-black/50 hover:border-[#0166aa]/30"
           style={{
             background: `
               linear-gradient(135deg, 
@@ -305,7 +299,7 @@ export default function LandingPage() {
           <div key={currentSlide} className="space-y-10 animate-fade-in">
             {/* Enhanced Title with 3D Effect */}
             <div className="relative">
-              <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent tracking-wide leading-tight animate-text-shimmer drop-shadow-2xl">
+              <h1 className="text-4xl md:text-5xl font-black bg-gradient-to-r from-white via-cyan-100 to-purple-100 bg-clip-text text-transparent tracking-wide leading-tight animate-text-shimmer drop-shadow-2xl">
                 {currentProject.title}
               </h1>
               {/* Subtle 3D text shadow effect */}
@@ -322,13 +316,13 @@ export default function LandingPage() {
             </div>{" "}
             <div className="flex justify-center">
               <div className="w-min flex items-center space-x-2 z-10 bg-black/20 backdrop-blur-xl rounded-full px-4 py-2 border border-white/10">
-                {projectCards.map((_, index) => (
+    {projectCards.map((_, index) => (
                   <button
                     key={index}
                     className={`relative transition-all duration-500 transform focus:outline-none ${
                       index === currentSlide
-                        ? "w-3 h-3 bg-[#2563eb] rounded-full scale-110 shadow-md border-2 border-[#2563eb]"
-                        : "w-2.5 h-2.5 bg-white/40 hover:bg-[#2563eb]/40 rounded-full border border-white/20"
+      ? "w-3 h-3 bg-[#0166aa] rounded-full scale-110 shadow-md border-2 border-[#0166aa]"
+      : "w-2.5 h-2.5 bg-white/40 hover:bg-[#0166aa]/40 rounded-full border border-white/20"
                     }`}
                     onClick={() => handleSlideClick(index)}
                     aria-label={`Go to slide ${index + 1}`}
@@ -344,7 +338,7 @@ export default function LandingPage() {
             <div className="flex gap-4 flex-col md:flex-row items-center justify-center gap-y-3">
               {" "}
               <Button
-                className="bg-gradient-to-r from-[#2563eb] via-[#3b82f6] to-[#1d4ed8] hover:from-[#1d4ed8] hover:via-[#2563eb] hover:to-[#1e40af] text-white rounded-full px-10 py-4 text-lg font-bold group transition-all duration-300 hover:shadow-lg hover:shadow-[#2563eb]/30 border border-[#2563eb]/40 focus:outline-none relative overflow-hidden"
+                className="bg-gradient-to-r from-[#0166aa] via-[#0181d6] to-[#015a93] hover:from-[#015a93] hover:via-[#0166aa] hover:to-[#014e7e] text-white rounded-full px-10 py-4 text-lg font-bold group transition-all duration-300 hover:shadow-lg hover:shadow-[#0166aa]/30 border border-[#0166aa]/40 focus:outline-none relative overflow-hidden"
                 onClick={() => window.open(currentProject.link, "_blank")}
               >
                 <span className="relative z-10 flex items-center">
@@ -364,9 +358,9 @@ export default function LandingPage() {
             </div>
           </div>{" "}
           {/* Enhanced Card Glow Effects */}
-          <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#2563eb]/10 via-[#3b82f6]/10 to-[#1d4ed8]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
-          <div className="absolute -inset-1 bg-gradient-to-r from-[#2563eb] via-[#3b82f6] to-[#1d4ed8] rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-700 blur-xl pointer-events-none"></div>
-          <div className="absolute -inset-2 bg-gradient-to-r from-[#2563eb] via-[#3b82f6] to-[#1d4ed8] rounded-lg opacity-0 group-hover:opacity-10 transition-opacity duration-1000 blur-2xl pointer-events-none"></div>
+          <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#0166aa]/10 via-[#0181d6]/10 to-[#014e7e]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+          <div className="absolute -inset-1 bg-gradient-to-r from-[#0166aa] via-[#0181d6] to-[#014e7e] rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-700 blur-xl pointer-events-none"></div>
+          <div className="absolute -inset-2 bg-gradient-to-r from-[#0166aa] via-[#0181d6] to-[#014e7e] rounded-lg opacity-0 group-hover:opacity-10 transition-opacity duration-1000 blur-2xl pointer-events-none"></div>
         </Card>
         {/* Right Arrow with Hover Effect */}
         <Button
@@ -380,13 +374,11 @@ export default function LandingPage() {
           <ChevronRight className="h-6 w-6 transition-transform group-hover:translate-x-1" />
         </Button>
       </div>{" "}
-      {/* Beautiful Enhanced Slide Indicators */}
-      {/* Enhanced Progress indicator */}
-      <MarqueeText
-        texts={marqueeTexts}
-        speed={30}
-        className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-black via-gray-900 to-black text-white overflow-hidden z-10 border-t border-white/10"
-      />
+      {/* Curved Loop Banner */}
     </div>
+      <div className="bg-black text-white z-10 pt-16">
+        <CurvedLoopSection />
+      </div>
+    </>
   );
 }

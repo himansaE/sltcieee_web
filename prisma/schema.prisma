@@ -209,3 +209,61 @@ model EventGalleryItem {
 
   @@map("eventGalleryItem")
 }
+
+// Enums and model for configurable homepage hero announcements
+enum CTAButtonStyle {
+  PRIMARY
+  SECONDARY
+}
+
+enum HeroBackgroundType {
+  IMAGE
+}
+
+// Removed gradient styles as hero background is image-only now
+
+enum HeroOverlayOpacity {
+  LIGHT // ~20%
+  MEDIUM // ~40%
+  DARK // ~60%
+}
+
+enum HeroContentLayout {
+  LEFT
+  CENTER
+}
+
+model HeroAnnouncement {
+  id              String             @id @map("_id") @default(cuid())
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  internalTitle   String
+  headline        String
+  subHeadline     String?
+
+  // Buttons: up to 2
+  buttons         Json               // [{ text: string, url: string, style: CTAButtonStyle }]
+
+  // Visuals & Branding
+  backgroundType  HeroBackgroundType
+  desktopImageUrl String?
+  imageAlt        String?
+  overlay         HeroOverlayOpacity @default(MEDIUM)
+  contentLayout   HeroContentLayout  @default(LEFT)
+
+  // Special features
+  countdownEnabled Boolean           @default(false)
+  countdownTo      DateTime?
+  countdownLabel   String?
+
+  badgeEnabled     Boolean           @default(false)
+  badgeText        String?
+
+  // Scheduling
+  scheduleEnabled  Boolean           @default(false)
+  startAt          DateTime?
+  endAt            DateTime?
+
+  @@map("heroAnnouncement")
+}

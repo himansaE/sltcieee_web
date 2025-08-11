@@ -35,6 +35,7 @@ export const AdminSideNav: React.FC<AdminSideNavProps> = (props) => {
     "/admin/dashboard",
     "/admin/blog",
     "/admin/authors",
+  "/admin/dashboard/hero",
   ]);
 
   const items = navLinks.filter((item) => {

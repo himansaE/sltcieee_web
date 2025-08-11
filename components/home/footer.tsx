@@ -20,7 +20,7 @@ export default function Footer() {
       href: "mailto:ieeestudentbranch@sltc.ac.lk",
     },
     { icon: Phone, text: "+94 11 234 5678", href: "tel:+94112345678" },
-    { icon: MapPin, text: "Colombo, Sri Lanka", href: "#" },
+    { icon: MapPin, text: "Padukka, Sri Lanka", href: "#" },
   ];
 
   return (

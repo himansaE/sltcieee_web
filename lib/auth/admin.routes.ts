@@ -47,6 +47,10 @@ export const adminRoutes: ReadonlyArray<{
   { pattern: "/api/admin/authors", roles: [Role.admin, Role.content] },
   { pattern: "/api/admin/authors/*", roles: [Role.admin, Role.content] },
 
+  // API: hero announcements (admin + content)
+  { pattern: "/api/admin/hero", roles: [Role.admin, Role.content] },
+  { pattern: "/api/admin/hero/*", roles: [Role.admin, Role.content] },
+
   // API: upload (admin + content)
   { pattern: "/api/admin/upload", roles: [Role.admin, Role.content] },
 

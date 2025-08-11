@@ -33,7 +33,7 @@ export default function JoinUs() {
             {" "}
             {/* Updated button style to match the contact us button */}
             <button
-              className="group relative bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-3 px-8 rounded-full text-base transition-all duration-300 shadow-lg shadow-cyan-500/30 hover:shadow-xl hover:shadow-cyan-500/50 transform hover:scale-105 border border-cyan-400/20 hover:border-cyan-300/30 pointer-events-auto touch-auto"
+              className="group relative bg-[#0166aa] hover:bg-[#015a93] text-white font-semibold py-3 px-8 rounded-full text-base transition-all duration-300 shadow-lg shadow-[#0166aa]/30 hover:shadow-xl hover:shadow-[#0166aa]/50 transform hover:scale-105 border border-[#0166aa]/20 hover:border-[#0166aa]/30 pointer-events-auto touch-auto"
               style={{ pointerEvents: "auto" }}
             >
               {" "}
@@ -54,7 +54,7 @@ export default function JoinUs() {
                 </svg>
               </span>
               {/* Button glow effect */}
-              <div className="absolute inset-0 rounded-full bg-cyan-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl"></div>
+              <div className="absolute inset-0 rounded-full bg-[#0166aa] opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl"></div>
             </button>
           </div>
         </div>

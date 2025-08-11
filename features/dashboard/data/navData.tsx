@@ -6,6 +6,7 @@ import {
   HomeIcon,
   PenToolIcon,
   UsersRound,
+  Megaphone,
 } from "lucide-react";
 import type { Role } from "@prisma/client";
 
@@ -31,6 +32,12 @@ export const navLinks: Array<{
     title: "Authors",
     url: "/admin/authors",
     icon: PenToolIcon,
+    minRole: "content" as unknown as Role,
+  },
+  {
+    title: "Hero",
+    url: "/admin/dashboard/hero",
+    icon: Megaphone,
     minRole: "content" as unknown as Role,
   },
   {

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { poppinsFont, wixMadeforDisplayFont } from "@/lib/fonts";
+import { figtreeFont, wixMadeforDisplayFont } from "@/lib/fonts";
 import ReactQueryProvider from "@/lib/query/queryProvider";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${wixMadeforDisplayFont.variable} ${poppinsFont.variable} antialiased  font-secondary`}
+        className={`${wixMadeforDisplayFont.variable} ${figtreeFont.variable} antialiased  font-secondary`}
       >
         <ReactQueryProvider>{children}</ReactQueryProvider>
         <Toaster />
